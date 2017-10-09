@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>HexRow.qml</file>
+        <file>fonts/CamingoCode.ttf</file>
+        <file>HexText.qml</file>
+    </qresource>
+</RCC>
