@@ -2,6 +2,8 @@
 #include <QQmlApplicationEngine>
 #include <QFontDatabase>
 
+#include "filemodel.h"
+
 int main(int argc, char *argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -9,6 +11,8 @@ int main(int argc, char *argv[])
 
     QFontDatabase fontDatabase;
     fontDatabase.addApplicationFont(":/fonts/CamingoCode.ttf");
+
+    qmlRegisterType<FileModel>("ReverseEngi", 1, 0, "FileModel");
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
