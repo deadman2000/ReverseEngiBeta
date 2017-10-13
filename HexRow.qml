@@ -5,9 +5,9 @@ Row {
     spacing: 0
     height: 32
 
-    property alias addressText: addressText.text
-    property alias hex: hexText.text
-    property alias text: textText.text
+    property alias addressText: addressLabel.text
+    property alias hexText: hexLabel.text
+    property alias asciiText: textLabel.text
 
     Item {
         width: 16
@@ -15,7 +15,7 @@ Row {
     }
 
     HexText {
-        id: addressText
+        id: addressLabel
         text: '0000 0000'
     }
 
@@ -25,7 +25,7 @@ Row {
     }
 
     HexText {
-        id: hexText
+        id: hexLabel
         text: '00 99 00 0A BC DE F0 00  01 02 03 04 05 06 07 08'
     }
 
@@ -35,7 +35,7 @@ Row {
     }
 
     HexText {
-        id: textText
+        id: textLabel
         text: '................'
     }
 }

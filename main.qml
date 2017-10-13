@@ -15,7 +15,6 @@ ApplicationWindow {
         Flow {
             id: flow
             width: parent.width
-
         }
     }
 
@@ -205,26 +204,27 @@ ApplicationWindow {
         id: hexList
         anchors.fill: parent
         model: fileModel
-        //model: 50
-        delegate: HexRow {
-            addressText: address
-            //property int index: modelData
-            //property int index: type
-        }
         interactive: false
 
-        ScrollBar.vertical: ScrollBar { id: scrollBar }
-
         header: Item { width: 1; height: 16 }
+
+        delegate: HexRow {
+            addressText: address
+            hexText: hex
+            asciiText: text
+        }
+
         footer: Item { width: 1; height: hexList.height / 2 }
+
+        ScrollBar.vertical: ScrollBar { id: scrollBar }
 
         MouseArea {
             anchors.fill: parent
             onWheel: {
                 if (wheel.angleDelta.y < 0)
-                    scrollBar.increase()
+                    hexList.contentY += 32 * 3
                 else
-                    scrollBar.decrease()
+                    hexList.contentY -= 32 * 3
                 wheel.accepted = true
             }
 
