@@ -27,7 +27,7 @@ ApplicationWindow {
         id: fileModel
     }
 
-    Component.onCompleted: fileModel.setFilePath('c:/Windows/explorer.exe')
+    Component.onCompleted: fileModel.openFile('c:/Windows/RtlExUpd.dll')
 
     Item {
         id: bgrItem
@@ -73,9 +73,8 @@ ApplicationWindow {
         }
     }
 
-    property bool selection: false
-    property point selStart
-    property point selEnd
+    property point selStart: Qt.point(-1, -1)
+    property point selEnd:  Qt.point(-1, -1)
 
     function getSym(col, x, letterWidth)
     {
@@ -97,7 +96,7 @@ ApplicationWindow {
 
         var it = hexList.itemAt(x, y)
         if (it === null) return null
-        return Qt.point(sym, it.index)
+        return Qt.point(sym, it.rowIndex)
     }
 
     function textAt(x, y)
@@ -108,7 +107,7 @@ ApplicationWindow {
 
         var it = hexList.itemAt(x, y)
         if (it === null) return null
-        return Qt.point(sym, it.index)
+        return Qt.point(sym, it.rowIndex)
     }
 
     function hexPos(coord)
@@ -119,12 +118,13 @@ ApplicationWindow {
         else
             x = colHex3.x + (coord.x - 8) * hexLetter.width * 3
 
-        return Qt.point(x, coord.y * 32)
+        return Qt.point(x, coord.y * 32 - hexList.contentY)
     }
 
     function textPos(coord)
     {
-        return Qt.point(colAscii.x + coord.x * hexLetter.width, coord.y * 32)
+        return Qt.point(colAscii.x + coord.x * hexLetter.width,
+                        coord.y * 32 - hexList.contentY)
     }
 
     function setAlpha(color, alpha)
@@ -135,7 +135,6 @@ ApplicationWindow {
     Canvas {
         id: sectionDrawer
         anchors.fill: parent
-        visible: false
 
         function drawSectionPoly(ctx, startPos, endPos, boundLeft, boundRight, symWidth)
         {
@@ -153,8 +152,8 @@ ApplicationWindow {
         {
             if (!fillColor) fillColor = setAlpha(color, 0.1)
 
-            ctx.fillStyle    = fillColor
-            ctx.strokeStyle  = color
+            ctx.fillStyle = fillColor
+            ctx.strokeStyle = color
             ctx.lineWidth = 2
 
             if (start.x + start.y * 16 > end.x + end.y * 16){
@@ -195,7 +194,7 @@ ApplicationWindow {
             var ctx = getContext("2d");
             ctx.reset()
 
-            if (selection && selEnd.x >= 0)
+            if (selEnd.x >= 0)
                 drawSection(ctx, selStart, selEnd, Qt.rgba(1,0,0,1))
         }
     }
@@ -212,6 +211,7 @@ ApplicationWindow {
             addressText: address
             hexText: hex
             asciiText: text
+            rowIndex: index
         }
 
         footer: Item { width: 1; height: hexList.height / 2 }
@@ -222,13 +222,16 @@ ApplicationWindow {
             anchors.fill: parent
             onWheel: {
                 if (wheel.angleDelta.y < 0)
-                    hexList.contentY += 32 * 3
+                    hexList.contentY = Math.min(hexList.contentY + 32 * 3, hexList.contentHeight - hexList.height)
                 else
-                    hexList.contentY -= 32 * 3
+                    hexList.contentY = Math.max(hexList.contentY - 32 * 3, -hexList.headerItem.height)
+
                 wheel.accepted = true
+                sectionDrawer.requestPaint()
             }
 
             property bool selectText: false
+            property bool selection: false
 
             onPressed: {
                 var p = hexAt(mouse.x, mouse.y)

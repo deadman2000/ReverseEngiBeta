@@ -9,6 +9,8 @@ Row {
     property alias hexText: hexLabel.text
     property alias asciiText: textLabel.text
 
+    property int rowIndex
+
     Item {
         width: 16
         height: 1

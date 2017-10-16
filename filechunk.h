@@ -5,13 +5,17 @@ class FileData;
 
 class FileChunk
 {
-public:
-    FileChunk();
-
-    FileDataPtr getData(int offset, int size);
-private:
-    int _offset;
+    const char * _data;
     int _size;
+    int _rowSize;
+    FileDataPtr * _rows;
+    int _rowCount;
+
+public:
+    FileChunk(const char * data, int size, int rowSize);
+    ~FileChunk();
+
+    FileDataPtr getRow(int number);
 };
 
 #endif // FILECHUNK_H

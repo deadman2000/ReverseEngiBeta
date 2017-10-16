@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <QString>
+#include <QDebug>
 
 class FileChunk;
 typedef std::shared_ptr<FileChunk> FileChunkPtr;

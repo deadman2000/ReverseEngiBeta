@@ -3,14 +3,16 @@
 
 class FileData
 {
+    const char * _data;
+    int _size;
+    QString _text;
+    QString _hex;
+
 public:
-    explicit FileData(std::shared_ptr<FileChunk> chunk);
+    FileData(const char * data, int size);
 
     QString asText();
     QString asHex();
-
-private:
-    FileChunkPtr _chunk;
 };
 
 #endif // FILEDATA_H

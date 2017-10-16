@@ -1,6 +1,5 @@
 #include "filemodel.h"
 
-#include <QDebug>
 #include <QFile>
 
 #include <unordered_map>
@@ -8,52 +7,77 @@
 #include "filechunk.h"
 #include "filedata.h"
 
-#define CHUNK_SIZE 2048
-
 class FileModel::FileModelImpl
 {
+    FileChunkPtr * _chunks;
+    int _chunkCount;
+    QFile * _file;
+    int _fileSize;
+    const int rowSize = 16;
+    const int rowsInChunk = 128;
+
 public:
     QString filePath;
-    int fileSize;
     int rowCount;
-    QFile * file;
-    std::unordered_map<int, FileChunkPtr> chunks;
 
     FileModelImpl()
-        : fileSize(0)
+        : _chunks(nullptr)
+        , _chunkCount(0)
+        , _file(nullptr)
+        , _fileSize(0)
         , rowCount(0)
-        , file(nullptr)
     {}
 
     void openFile(const QString &path)
     {
-        if (file){
-            file->close();
-            delete file;
-            file = nullptr;
+        if (_file){
+            _file->close();
+            delete _file;
+            _file = nullptr;
+
+            delete _chunks;
+            _chunks = nullptr;
         }
-        file = new QFile(path);
-        file->open(QFile::ReadOnly);
+        _file = new QFile(path);
+        _file->open(QFile::ReadOnly);
 
         filePath = path;
-        fileSize = static_cast<int>(file->size());
-        rowCount = fileSize / 16;
+        _fileSize = static_cast<int>(_file->size());
+        rowCount = qRound(_fileSize / rowSize + 0.5);
+
+
+        _chunkCount = qRound(rowCount / rowsInChunk + 0.5);
+        _chunks = new FileChunkPtr[_chunkCount];
+
+        qDebug() << "FileSize: " << _fileSize;
+        qDebug() << "Rows: " << rowCount;
+        qDebug() << "Chunks: " << _chunkCount;
     }
 
     FileChunkPtr getChunk(int number)
     {
-        return FileChunkPtr();
+        Q_ASSERT(number < _chunkCount);
+
+        FileChunkPtr ptr = _chunks[number];
+        if (ptr) return ptr;
+
+        int size = rowsInChunk * rowSize;
+        int offset = number * size;
+        if (offset + size > _fileSize)
+            size = _fileSize - offset;
+
+        _file->seek(offset);
+        char* data = new char[size];
+        int bytes = static_cast<int>(_file->read(data, size));
+        Q_ASSERT(bytes == size);
+
+        return _chunks[number] = std::make_shared<FileChunk>(data, size, rowSize);
     }
 
-    FileDataPtr getData(int offset, int size)
+    FileDataPtr getRow(int row)
     {
-        int chunkFrom = offset / CHUNK_SIZE;
-        int chunkTo = static_cast<int>(static_cast<double>(offset + size) / CHUNK_SIZE + 0.5);
-        qDebug() << chunkFrom << " - " << chunkTo;
-
-        auto chunk = getChunk(chunkFrom);
-
-        return chunk->getData(offset, size);
+        int chunkNumber = row / rowsInChunk;
+        return getChunk(chunkNumber)->getRow(row - chunkNumber * rowsInChunk);
     }
 };
 
@@ -89,14 +113,16 @@ QVariant FileModel::data(const QModelIndex &index, int role) const
     if (index.row() >= impl->rowCount || index.row() < 0)
         return QVariant();
 
-    int offset = index.row() * 16;
     if (role == AddressRole){
+        int offset = index.row() * 16;
         return QString("%1 %2").arg(offset >> 16, 4, 16, QLatin1Char('0')).arg(offset & 0xFFFF, 4, 16, QLatin1Char('0'));
-    } else if (role == HexRole) {
-        return impl->getData(offset, 16)->asHex();
-    } else if (role == TextRole) {
-        return impl->getData(offset, 16)->asText();
     }
+
+    if (role == HexRole)
+        return impl->getRow(index.row())->asHex();
+
+    if (role == TextRole)
+        return impl->getRow(index.row())->asText();
     return QVariant();
 }
 
