@@ -18,7 +18,6 @@ Row {
 
     HexText {
         id: addressLabel
-        text: '0000 0000'
     }
 
     Item {
@@ -28,7 +27,6 @@ Row {
 
     HexText {
         id: hexLabel
-        text: '00 99 00 0A BC DE F0 00  01 02 03 04 05 06 07 08'
     }
 
     Item {
@@ -38,6 +36,5 @@ Row {
 
     HexText {
         id: textLabel
-        text: '................'
     }
 }

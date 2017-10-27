@@ -1,6 +1,7 @@
 #include "filemodel.h"
 
 #include <QFile>
+#include <QUrl>
 
 #include <unordered_map>
 
@@ -128,7 +129,13 @@ QVariant FileModel::data(const QModelIndex &index, int role) const
 
 void FileModel::openFile(const QString &path)
 {
+    QString filePath = path;
+
+    QUrl url(path);
+    if (url.isValid() && url.isLocalFile())
+        filePath = url.toLocalFile();
+
     beginResetModel();
-    impl->openFile(path);
+    impl->openFile(filePath);
     endResetModel();
 }

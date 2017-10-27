@@ -132,7 +132,7 @@ ApplicationWindow {
         return Qt.rgba(color.r, color.g, color.b, alpha)
     }
 
-    Canvas {
+    Canvas { // Отрисовка секций файла
         id: sectionDrawer
         anchors.fill: parent
 
@@ -204,6 +204,13 @@ ApplicationWindow {
         anchors.fill: parent
         model: fileModel
         interactive: false
+        focus: true
+
+        readonly property real scrollPosition: (contentY + headerItem.height) / (contentHeight - height + headerItem.height)
+
+        function setScroll(value) {
+            contentY = value * (contentHeight - height + headerItem.height) - headerItem.height
+        }
 
         header: Item { width: 1; height: 16 }
 
@@ -216,7 +223,14 @@ ApplicationWindow {
 
         footer: Item { width: 1; height: hexList.height / 2 }
 
-        ScrollBar.vertical: ScrollBar { id: scrollBar }
+        //ScrollBar.vertical: ScrollBar { id: scrollBar }
+
+        Keys.onPressed: {
+            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                console.log('enter')
+                event.accepted = true
+            }
+        }
 
         MouseArea {
             anchors.fill: parent
@@ -269,6 +283,40 @@ ApplicationWindow {
 
             onReleased: {
                 selection = false
+            }
+        }
+    }
+
+    ScrollBar {
+        id: scrollBar
+        size: 0.1
+        anchors.right: parent.right
+        height: parent.height
+        width: 16
+        policy: ScrollBar.AlwaysOn
+        interactive: true
+
+        Binding {
+            target: scrollBar
+            property: "position"
+            value: hexList.scrollPosition * (1 - scrollBar.size)
+            when: !scrollBar.pressed
+        }
+
+        onPositionChanged: if (pressed) hexList.setScroll(position / (1 - size))
+    }
+
+    DropArea {
+        anchors.fill: parent
+        onEntered: {
+            if (drag.hasUrls){
+                // TODO проверку на isFile и fileExists
+                drag.accept(Qt.CopyAction);
+            }
+        }
+        onDropped: {
+            if (drop.hasUrls){
+                fileModel.openFile(drop.urls)
             }
         }
     }
