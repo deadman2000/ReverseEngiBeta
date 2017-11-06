@@ -8,37 +8,38 @@ FileData::FileData(const char * data, int size)
 
 QString FileData::asText()
 {
-    if (_text.isEmpty())
+    char * arr = new char[_size + 1];
+    for (int i=0; i<_size; i++)
     {
-        char * arr = new char[_size + 1];
-        for (int i=0; i<_size; i++)
-        {
-            if (_data[i] < 32)
-                arr[i] = '.';
-            else
-                arr[i] = _data[i];
-        }
-        arr[_size] = 0;
-        _text = QString(arr);
-        delete[] arr;
+        if (_data[i] < 32)
+            arr[i] = '.';
+        else
+            arr[i] = _data[i];
     }
-    return _text;
+    arr[_size] = 0;
+    QString text = QString(arr);
+    delete[] arr;
+    return text;
+}
+
+inline char toHex(char number)
+{
+    Q_ASSERT(number >= 0 && number < 0x10);
+    if (number < 0xA)
+        return 0x30 + number;
+    else
+        return 0x37 + number;
 }
 
 QString FileData::asHex()
 {
-    if (_hex.isEmpty())
+    QByteArray symbols(_size * 2 + _size - 1, ' ');
+
+    for (int i=0; i<_size; i++)
     {
-        QString str("%1 %2 %3 %4 %5 %6 %7 %8  %9 %10 %11 %12 %13 %14 %15 %16");
-
-        for (int i=0; i<_size; i++)
-            str = str.arg(_data[i] & 0xFF, 2, 16, QLatin1Char('0'));
-
-        if (_size < 16)
-            for (int i =_size; i< 16; i++)
-                str = str.arg("  ");
-
-        _hex = str.toUpper();
+        symbols[i * 3] = toHex((_data[i] >> 4) & 0xf);
+        symbols[i * 3 + 1] = toHex(_data[i] & 0xf);
     }
-    return _hex;
+
+    return QString(symbols);
 }

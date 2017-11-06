@@ -3,6 +3,7 @@
 #include <QFontDatabase>
 
 #include "filemodel.h"
+#include "addressrange.h"
 
 int main(int argc, char *argv[])
 {
@@ -13,6 +14,7 @@ int main(int argc, char *argv[])
     fontDatabase.addApplicationFont(":/fonts/CamingoCode.ttf");
 
     qmlRegisterType<FileModel>("ReverseEngi", 1, 0, "FileModel");
+    qmlRegisterType<AddressRange>("ReverseEngi", 1, 0, "AddressRange");
 
     QQmlApplicationEngine engine;
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));

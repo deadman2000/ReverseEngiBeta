@@ -1,0 +1,59 @@
+#ifndef ADDRESSRANGE_H
+#define ADDRESSRANGE_H
+
+#include <QObject>
+#include <QColor>
+
+class AddressRange : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(int begin READ begin WRITE setBegin NOTIFY beginChanged)
+    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+    Q_PROPERTY(QColor borderColor READ borderColor WRITE setBorderColor NOTIFY borderColorChanged)
+    Q_PROPERTY(int borderWidth READ borderWidth WRITE setBorderWidth NOTIFY borderWidthChanged)
+public:
+    explicit AddressRange(QObject *parent = nullptr);
+
+    int begin() const { return _begin; }
+
+    void setBegin(int begin);
+
+    Q_PROPERTY(int end READ end WRITE setEnd NOTIFY endChanged)
+
+    int end() const { return _end; }
+
+    void setEnd(int end);
+
+    Q_INVOKABLE void reset();
+
+    Q_INVOKABLE bool isSet() const;
+
+    QColor color() const;
+    void setColor(QColor color);
+
+    QColor borderColor() const;
+    void setBorderColor(QColor color);
+
+    int borderWidth() const;
+    void setBorderWidth(int width);
+
+signals:
+    void beginChanged(int);
+    void endChanged(int);
+    void changed();
+
+    void colorChanged(QColor);
+    void borderColorChanged(QColor);
+    void borderWidthChanged(int);
+
+public slots:
+
+private:
+    int _begin;
+    int _end;
+    QColor _color;
+    QColor _borderColor;
+    int _borderWidth;
+};
+
+#endif // ADDRESSRANGE_H

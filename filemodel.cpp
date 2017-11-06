@@ -10,69 +10,69 @@
 
 class FileModel::FileModelImpl
 {
-    FileChunkPtr * _chunks;
-    int _chunkCount;
-    QFile * _file;
-    int _fileSize;
+public:
+    FileChunkPtr * chunks;
+    int chunkCount;
+    QFile * file;
+    int fileSize;
     const int rowSize = 16;
     const int rowsInChunk = 128;
 
-public:
     QString filePath;
     int rowCount;
 
     FileModelImpl()
-        : _chunks(nullptr)
-        , _chunkCount(0)
-        , _file(nullptr)
-        , _fileSize(0)
+        : chunks(nullptr)
+        , chunkCount(0)
+        , file(nullptr)
+        , fileSize(0)
         , rowCount(0)
     {}
 
     void openFile(const QString &path)
     {
-        if (_file){
-            _file->close();
-            delete _file;
-            _file = nullptr;
+        if (file){
+            file->close();
+            delete file;
+            file = nullptr;
 
-            delete _chunks;
-            _chunks = nullptr;
+            delete chunks;
+            chunks = nullptr;
         }
-        _file = new QFile(path);
-        _file->open(QFile::ReadOnly);
+        file = new QFile(path);
+        file->open(QFile::ReadOnly);
 
         filePath = path;
-        _fileSize = static_cast<int>(_file->size());
-        rowCount = qRound(_fileSize / rowSize + 0.5);
+        fileSize = static_cast<int>(file->size());
+        rowCount = qRound(fileSize / rowSize + 0.5);
 
 
-        _chunkCount = qRound(rowCount / rowsInChunk + 0.5);
-        _chunks = new FileChunkPtr[_chunkCount];
+        chunkCount = qRound(rowCount / rowsInChunk + 0.5);
+        chunks = new FileChunkPtr[chunkCount];
 
-        qDebug() << "FileSize: " << _fileSize;
+        qDebug() << "FileSize: " << fileSize;
         qDebug() << "Rows: " << rowCount;
-        qDebug() << "Chunks: " << _chunkCount;
+        qDebug() << "Chunks: " << chunkCount;
     }
 
     FileChunkPtr getChunk(int number)
     {
-        Q_ASSERT(number < _chunkCount);
+        Q_ASSERT(number < chunkCount);
 
-        FileChunkPtr ptr = _chunks[number];
+        FileChunkPtr ptr = chunks[number];
         if (ptr) return ptr;
 
         int size = rowsInChunk * rowSize;
         int offset = number * size;
-        if (offset + size > _fileSize)
-            size = _fileSize - offset;
+        if (offset + size > fileSize)
+            size = fileSize - offset;
 
-        _file->seek(offset);
+        file->seek(offset);
         char* data = new char[size];
-        int bytes = static_cast<int>(_file->read(data, size));
+        int bytes = static_cast<int>(file->read(data, size));
         Q_ASSERT(bytes == size);
 
-        return _chunks[number] = std::make_shared<FileChunk>(data, size, rowSize);
+        return chunks[number] = std::make_shared<FileChunk>(data, size, rowSize);
     }
 
     FileDataPtr getRow(int row)
@@ -97,8 +97,18 @@ QHash<int, QByteArray> FileModel::roleNames() const {
     QHash<int, QByteArray> roles;
     roles[AddressRole] = "address";
     roles[HexRole] = "hex";
-    roles[TextRole] = "text";
+    roles[TextRole] = "fileText";
     return roles;
+}
+
+int FileModel::size() const
+{
+    return impl->fileSize;
+}
+
+int FileModel::rows() const
+{
+    return impl->rowCount;
 }
 
 int FileModel::rowCount(const QModelIndex &) const
@@ -138,4 +148,7 @@ void FileModel::openFile(const QString &path)
     beginResetModel();
     impl->openFile(filePath);
     endResetModel();
+
+    emit sizeChanged(size());
+    emit rowsChanged(rows());
 }

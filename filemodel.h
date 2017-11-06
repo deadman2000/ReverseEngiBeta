@@ -5,29 +5,39 @@
 
 class FileModel : public QAbstractListModel
 {
-Q_OBJECT
-    public:
-        enum FileRoles {
-            AddressRole = Qt::UserRole + 1,
-            HexRole,
-            TextRole
-        };
+    Q_OBJECT
+    Q_PROPERTY(int size READ size NOTIFY sizeChanged)
+    Q_PROPERTY(int rows READ rows NOTIFY rowsChanged)
+public:
+    enum FileRoles {
+        AddressRole = Qt::UserRole + 1,
+        HexRole,
+        TextRole
+    };
 
-        explicit FileModel(QObject *parent = 0);
+    explicit FileModel(QObject *parent = 0);
 
-        ~FileModel();
+    ~FileModel();
 
-        int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-        QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-        virtual QHash<int, QByteArray> roleNames() const override;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    virtual QHash<int, QByteArray> roleNames() const override;
 
-    public slots:
-        void openFile(const QString &path);
+    int size() const;
 
-    private:
-        class FileModelImpl;
+    int rows() const;
 
-        FileModelImpl * impl;
+signals:
+    void sizeChanged(int);
+    void rowsChanged(int);
+
+public slots:
+    void openFile(const QString &path);
+
+private:
+    class FileModelImpl;
+
+    FileModelImpl * impl;
 };
 
 #endif // FILEMODEL_H

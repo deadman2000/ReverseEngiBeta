@@ -15,7 +15,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp \
     filemodel.cpp \
     filechunk.cpp \
-    filedata.cpp
+    filedata.cpp \
+    addressrange.cpp
 
 RESOURCES += qml.qrc
 
@@ -34,7 +35,8 @@ HEADERS += \
     filemodel.h \
     filechunk.h \
     filedata.h \
-    stdafx.h
+    stdafx.h \
+    addressrange.h
 
 PRECOMPILED_HEADER += stdafx.h
 

@@ -2,8 +2,13 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>qtquickcontrols2.conf</file>
-        <file>HexRow.qml</file>
         <file>fonts/CamingoCode.ttf</file>
         <file>HexText.qml</file>
+        <file>AddressList.qml</file>
+        <file>HexList.qml</file>
+        <file>TextList.qml</file>
+        <file>SectionDrawer.qml</file>
+        <file>CursorRect.qml</file>
+        <file>SelectionArea.qml</file>
     </qresource>
 </RCC>
