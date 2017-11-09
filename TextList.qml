@@ -47,6 +47,8 @@ Item {
 
                 property int rowIndex: index
             }
+
+        footer: Item { height: list.height; width: 1 }
     }
 
     SectionDrawer { }

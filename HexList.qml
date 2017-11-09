@@ -55,6 +55,8 @@ Item {
                     anchors.fill: parent
                 }*/
             }
+
+        footer: Item { height: list.height; width: 1 }
     }
 
     SectionDrawer { paddingX: hexLetter.width / 2; }

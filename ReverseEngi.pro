@@ -16,7 +16,10 @@ SOURCES += main.cpp \
     filemodel.cpp \
     filechunk.cpp \
     filedata.cpp \
-    addressrange.cpp
+    addressrange.cpp \
+    base_interpreters.cpp \
+    idatasource.cpp \
+    idatainterpreter.cpp
 
 RESOURCES += qml.qrc
 
@@ -36,7 +39,9 @@ HEADERS += \
     filechunk.h \
     filedata.h \
     stdafx.h \
-    addressrange.h
+    addressrange.h \
+    idatainterpreter.h \
+    idatasource.h
 
 PRECOMPILED_HEADER += stdafx.h
 

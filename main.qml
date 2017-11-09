@@ -49,49 +49,6 @@ ApplicationWindow {
         return point.y * 16 + point.x
     }
 
-    QtObject {
-        id: cursor
-
-        property int offset: 0
-
-        property point pos: addressToPoint(offset)
-        onPosChanged: ensureVisible()
-
-        function moveLeft(){
-            if (offset == 0) return
-            offset--
-        }
-
-        function moveRight(){
-            if (offset == fileModel.size) return
-            offset++
-        }
-
-        function moveUp(){
-            offset = Math.max(0, offset - 16)
-        }
-
-        function moveDown(){
-            offset = Math.min(fileModel.size - 1, offset + 16)
-        }
-
-        function movePageUp(){
-            offset = Math.max(0, offset - 16 * rowsInScreen)
-        }
-
-        function movePageDown(){
-            offset = Math.min(fileModel.size - 1, offset + 16 * rowsInScreen)
-        }
-
-        function ensureVisible()
-        {
-            if (pos.y < topRow)
-                topRow = pos.y
-            else if (pos.y >= topRow + rowsInScreen)
-                topRow = pos.y - rowsInScreen + 1
-        }
-    }
-
     property int rowHeight: 32
     property int listTopPadding: 8
 
@@ -202,6 +159,12 @@ ApplicationWindow {
             case Qt.Key_PageDown:
                 cursor.movePageDown()
                 break
+            case Qt.Key_Home:
+                cursor.moveBegin()
+                break
+            case Qt.Key_End:
+                cursor.moveEnd()
+                break;
 
             default:
                 return;
@@ -213,6 +176,7 @@ ApplicationWindow {
         ScrollBar {
             id: scrollBar
             size: Math.max( rowsInScreen / fileModel.rows, 16 / height)
+            visible: size < 1
             anchors.right: parent.right
             height: parent.height
             width: 16
@@ -227,6 +191,54 @@ ApplicationWindow {
             }
 
             onPositionChanged: if (pressed) setScroll(position / (1 - size))
+        }
+    }
+
+    QtObject {
+        id: cursor
+        property int offset: 0
+        property point pos: addressToPoint(offset)
+        onPosChanged: ensureVisible()
+
+        function moveLeft(){
+            if (offset == 0) return
+            offset--
+        }
+
+        function moveRight(){
+            if (offset == fileModel.size) return
+            offset++
+        }
+
+        function moveUp(){
+            offset = Math.max(0, offset - 16)
+        }
+
+        function moveDown(){
+            offset = Math.min(fileModel.size - 1, offset + 16)
+        }
+
+        function movePageUp(){
+            offset = Math.max(0, offset - 16 * rowsInScreen)
+        }
+
+        function movePageDown(){
+            offset = Math.min(fileModel.size - 1, offset + 16 * rowsInScreen)
+        }
+
+        function moveBegin(){
+            offset = 0
+        }
+
+        function moveEnd(){
+            offset = fileModel.size - 1
+        }
+
+        function ensureVisible(){
+            if (pos.y < topRow)
+                topRow = pos.y
+            else if (pos.y >= topRow + rowsInScreen)
+                topRow = pos.y - rowsInScreen + 1
         }
     }
 

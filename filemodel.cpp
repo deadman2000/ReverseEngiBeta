@@ -44,8 +44,7 @@ public:
 
         filePath = path;
         fileSize = static_cast<int>(file->size());
-        rowCount = qRound(fileSize / rowSize + 0.5);
-
+        rowCount = qRound(fileSize / rowSize + 0.49999999);
 
         chunkCount = qRound(rowCount / rowsInChunk + 0.5);
         chunks = new FileChunkPtr[chunkCount];
