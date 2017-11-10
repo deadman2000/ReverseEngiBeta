@@ -29,7 +29,15 @@ ApplicationWindow {
         id: fileModel
     }
 
-    Component.onCompleted: fileModel.openFile('c:/Windows/RtlExUpd.dll')
+    property Interpreter interpreter
+
+    Component.onCompleted: {
+        fileModel.openFile('c:/Windows/RtlExUpd.dll')
+
+        var component = Qt.createComponent("Interpreter.qml");
+        interpreter = component.createObject(fileItem);
+        interpreter.show();
+    }
 
     property AddressRange selection: AddressRange
     {

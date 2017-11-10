@@ -10,5 +10,6 @@
         <file>SectionDrawer.qml</file>
         <file>CursorRect.qml</file>
         <file>SelectionArea.qml</file>
+        <file>Interpreter.qml</file>
     </qresource>
 </RCC>

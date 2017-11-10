@@ -19,7 +19,10 @@ SOURCES += main.cpp \
     addressrange.cpp \
     base_interpreters.cpp \
     idatasource.cpp \
-    idatainterpreter.cpp
+    instruments.cpp \
+    qmlglobal.cpp \
+    basedatainterpreter.cpp \
+    interpretermodel.cpp
 
 RESOURCES += qml.qrc
 
@@ -40,8 +43,12 @@ HEADERS += \
     filedata.h \
     stdafx.h \
     addressrange.h \
-    idatainterpreter.h \
-    idatasource.h
+    idatasource.h \
+    instruments.h \
+    base_interpreters.h \
+    qmlglobal.h \
+    basedatainterpreter.h \
+    interpretermodel.h
 
 PRECOMPILED_HEADER += stdafx.h
 

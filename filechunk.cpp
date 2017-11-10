@@ -16,6 +16,18 @@ FileChunk::~FileChunk()
     delete _rows;
 }
 
+std::vector<char> FileChunk::getData(int offset, int size) const
+{
+    Q_ASSERT(offset >= 0 && offset + size < _size);
+
+    return std::vector<char>(_data + offset, _data + offset + size);
+}
+
+int FileChunk::size() const
+{
+    return _size;
+}
+
 FileDataPtr FileChunk::getRow(int number)
 {
     Q_ASSERT(number < _rowCount);

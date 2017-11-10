@@ -17,6 +17,7 @@ public:
     int fileSize;
     const int rowSize = 16;
     const int rowsInChunk = 128;
+    const int chunkSize = rowSize * rowsInChunk;
 
     QString filePath;
     int rowCount;
@@ -78,6 +79,31 @@ public:
     {
         int chunkNumber = row / rowsInChunk;
         return getChunk(chunkNumber)->getRow(row - chunkNumber * rowsInChunk);
+    }
+
+    std::vector<char> getData(int offset, int size)
+    {
+        std::vector<char> v;
+        v.reserve(size);
+
+        int dataEnd = offset + size ;
+        int chunkBegin = offset / chunkSize;
+        int chunkEnd = (offset + size) / chunkSize;
+
+        for (int i = chunkBegin; i<=chunkEnd; ++i)
+        {
+            auto chunk = getChunk(i);
+            int chunkOffset = i * chunkSize;
+            int chunkOffsetEnd = chunkOffset + chunkSize;
+
+            int from = std::max(0, offset - chunkOffset);
+            int to   = std::min(chunkOffsetEnd, dataEnd) - chunkOffset;
+
+            std::vector<char> subData = chunk->getData(from, to);
+            v.insert(v.end(), subData.begin(), subData.end());
+        }
+
+        return std::move(v);
     }
 };
 
@@ -150,4 +176,11 @@ void FileModel::openFile(const QString &path)
 
     emit sizeChanged(size());
     emit rowsChanged(rows());
+}
+
+
+std::vector<char> FileModel::getData(int offset, int size)
+{
+    auto v = impl->getData(offset, size);
+    return std::move(v);
 }

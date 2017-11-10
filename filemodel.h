@@ -3,18 +3,20 @@
 
 #include <QAbstractListModel>
 
-class FileModel : public QAbstractListModel
+#include "idatasource.h"
+
+class FileModel : public QAbstractListModel, public IDataSource
 {
     Q_OBJECT
     Q_PROPERTY(int size READ size NOTIFY sizeChanged)
     Q_PROPERTY(int rows READ rows NOTIFY rowsChanged)
-public:
+
     enum FileRoles {
         AddressRole = Qt::UserRole + 1,
         HexRole,
         TextRole
     };
-
+public:
     explicit FileModel(QObject *parent = 0);
 
     ~FileModel();
@@ -24,8 +26,10 @@ public:
     virtual QHash<int, QByteArray> roleNames() const override;
 
     int size() const;
-
     int rows() const;
+
+    // IDataSource interface
+    std::vector<char> getData(int offset, int size) override;
 
 signals:
     void sizeChanged(int);

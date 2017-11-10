@@ -11,6 +11,7 @@ class AddressRange : public QObject
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
     Q_PROPERTY(QColor borderColor READ borderColor WRITE setBorderColor NOTIFY borderColorChanged)
     Q_PROPERTY(int borderWidth READ borderWidth WRITE setBorderWidth NOTIFY borderWidthChanged)
+    Q_PROPERTY(int end READ end WRITE setEnd NOTIFY endChanged)
 public:
     explicit AddressRange(QObject *parent = nullptr);
 
@@ -18,15 +19,9 @@ public:
 
     void setBegin(int begin);
 
-    Q_PROPERTY(int end READ end WRITE setEnd NOTIFY endChanged)
-
     int end() const { return _end; }
 
     void setEnd(int end);
-
-    Q_INVOKABLE void reset();
-
-    Q_INVOKABLE bool isSet() const;
 
     QColor color() const;
     void setColor(QColor color);
@@ -47,6 +42,8 @@ signals:
     void borderWidthChanged(int);
 
 public slots:
+    void reset();
+    bool isSet() const;
 
 private:
     int _begin;
