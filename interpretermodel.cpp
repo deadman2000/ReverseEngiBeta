@@ -59,8 +59,10 @@ QVariant InterpreterModel::data(const QModelIndex &index, int role) const
     if (role == NameRole)
         return _interpreters.at(index.row())->name();
 
-    if (role == ValueRole)
+    if (role == ValueRole){
+        if (!_model) return QVariant();
         return _interpreters.at(index.row())->toString(_model, _offset);
+    }
 
     return QVariant();
 }

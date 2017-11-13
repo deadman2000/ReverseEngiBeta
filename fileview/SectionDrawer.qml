@@ -4,7 +4,7 @@ Canvas { // Отрисовка секций файла
     anchors.fill: parent
 
     Connections {
-        target: fileItem
+        target: fileView
         onTopRowChanged: requestPaint()
     }
 
@@ -90,7 +90,10 @@ Canvas { // Отрисовка секций файла
         var ctx = getContext("2d");
         ctx.reset()
 
-        if (selection.isSet())
+        if (selection.isSet)
             drawSection(ctx, selection)
+
+        for (var i=0; i<fileModel.sectionCount; ++i)
+            drawSection(ctx, fileModel.section(i))
     }
 }

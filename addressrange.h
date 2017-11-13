@@ -12,16 +12,19 @@ class AddressRange : public QObject
     Q_PROPERTY(QColor borderColor READ borderColor WRITE setBorderColor NOTIFY borderColorChanged)
     Q_PROPERTY(int borderWidth READ borderWidth WRITE setBorderWidth NOTIFY borderWidthChanged)
     Q_PROPERTY(int end READ end WRITE setEnd NOTIFY endChanged)
+    Q_PROPERTY(bool isSet READ isSet NOTIFY isSetChanged)
+    Q_PROPERTY(int size READ size NOTIFY sizeChanged)
 public:
     explicit AddressRange(QObject *parent = nullptr);
+    AddressRange(QObject * parent, int begin, int end, QColor bgrColor, QColor borderColor, int borderWidth);
 
-    int begin() const { return _begin; }
-
+    int begin() const;
     void setBegin(int begin);
 
-    int end() const { return _end; }
-
+    int end() const;
     void setEnd(int end);
+
+    int size() const;
 
     QColor color() const;
     void setColor(QColor color);
@@ -32,10 +35,14 @@ public:
     int borderWidth() const;
     void setBorderWidth(int width);
 
+    bool isSet() const;
+
 signals:
     void beginChanged(int);
     void endChanged(int);
+    void sizeChanged(int);
     void changed();
+    void isSetChanged(bool);
 
     void colorChanged(QColor);
     void borderColorChanged(QColor);
@@ -43,11 +50,16 @@ signals:
 
 public slots:
     void reset();
-    bool isSet() const;
+
+private:
+    void updateIsSet();
 
 private:
     int _begin;
     int _end;
+    bool _isSet;
+
+    // TODO Move to class "Style"
     QColor _color;
     QColor _borderColor;
     int _borderWidth;

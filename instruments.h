@@ -1,9 +1,9 @@
 #ifndef INSTRUMENTS_H
 #define INSTRUMENTS_H
 
-#include "basedatainterpreter.h"
-
 #include <QObject>
+
+#include "basedatainterpreter.h"
 
 class Instruments : public QObject
 {

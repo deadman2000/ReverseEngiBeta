@@ -2,6 +2,8 @@
 
 #include <QFile>
 #include <QUrl>
+#include <QGuiApplication>
+#include <QClipboard>
 
 #include <unordered_map>
 
@@ -45,7 +47,7 @@ public:
 
         filePath = path;
         fileSize = static_cast<int>(file->size());
-        rowCount = qRound(fileSize / rowSize + 0.49999999);
+        rowCount = qRound(fileSize / double(rowSize) + 0.49999999);
 
         chunkCount = qRound(rowCount / rowsInChunk + 0.5);
         chunks = new FileChunkPtr[chunkCount];
@@ -62,7 +64,7 @@ public:
         FileChunkPtr ptr = chunks[number];
         if (ptr) return ptr;
 
-        int size = rowsInChunk * rowSize;
+        int size = chunkSize;
         int offset = number * size;
         if (offset + size > fileSize)
             size = fileSize - offset;
@@ -81,10 +83,10 @@ public:
         return getChunk(chunkNumber)->getRow(row - chunkNumber * rowsInChunk);
     }
 
-    std::vector<char> getData(int offset, int size)
+    QByteArray getData(int offset, int size)
     {
-        std::vector<char> v;
-        v.reserve(size);
+        QByteArray arr;
+        arr.reserve(size);
 
         int dataEnd = offset + size ;
         int chunkBegin = offset / chunkSize;
@@ -94,22 +96,24 @@ public:
         {
             auto chunk = getChunk(i);
             int chunkOffset = i * chunkSize;
-            int chunkOffsetEnd = chunkOffset + chunkSize;
+            int chunkOffsetEnd = chunkOffset + std::min(chunkSize, chunk->size());
 
             int from = std::max(0, offset - chunkOffset);
             int to   = std::min(chunkOffsetEnd, dataEnd) - chunkOffset;
 
-            std::vector<char> subData = chunk->getData(from, to);
-            v.insert(v.end(), subData.begin(), subData.end());
+            if (to == from) break;
+
+            auto subData = chunk->getData(from, to - from);
+            arr.append(subData);
         }
 
-        return std::move(v);
+        return arr;
     }
 };
 
 FileModel::FileModel(QObject *parent)
     : QAbstractListModel(parent)
-    , impl(new FileModelImpl())
+    , impl(new FileModelImpl)
 {
 }
 
@@ -134,6 +138,11 @@ int FileModel::size() const
 int FileModel::rows() const
 {
     return impl->rowCount;
+}
+
+QString &FileModel::fileName() const
+{
+    return impl->filePath;
 }
 
 int FileModel::rowCount(const QModelIndex &) const
@@ -164,6 +173,8 @@ QVariant FileModel::data(const QModelIndex &index, int role) const
 
 void FileModel::openFile(const QString &path)
 {
+    _sections.clear();
+
     QString filePath = path;
 
     QUrl url(path);
@@ -176,11 +187,32 @@ void FileModel::openFile(const QString &path)
 
     emit sizeChanged(size());
     emit rowsChanged(rows());
+    emit fileNameChanged(impl->filePath);
 }
 
 
-std::vector<char> FileModel::getData(int offset, int size)
+QByteArray FileModel::getData(int offset, int size)
 {
-    auto v = impl->getData(offset, size);
-    return std::move(v);
+    return impl->getData(offset, size);
+}
+
+int FileModel::sectionCount() const
+{
+    return _sections.size();
+}
+
+AddressRange *FileModel::section(int index) const
+{
+    return _sections.at(index);
+}
+
+void FileModel::addSection(int begin, int end)
+{
+    _sections.append(new AddressRange(this, begin, end, QColor(0, 255, 0, 25), QColor(0, 255, 0), 2));
+}
+
+void FileModel::copyToClipboard(int begin, int end)
+{
+    auto data = getData(begin, end - begin + 1);
+    QGuiApplication::clipboard()->setText(QString(data));
 }

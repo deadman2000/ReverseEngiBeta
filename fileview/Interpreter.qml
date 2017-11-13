@@ -3,11 +3,11 @@ import QtQuick.Window 2.3
 import QtQuick.Controls 1.4
 import ReverseEngi 1.0
 
-Window {
+Item {
     width: 300
     height: 300
-    x: 0
-    y: 0
+    //x: 0
+    //y: 0
 
     TableView {
         anchors.fill: parent
@@ -24,22 +24,8 @@ Window {
         }
 
         model: InterpreterModel {
-            model: fileModel
-            offset: cursor.offset
+            model: currentFile.fileModel
+            offset: currentFile.cursor.offset
         }
     }
-
-    /*ListView {
-        anchors.fill: parent
-        model: G.instruments.interpreters
-        delegate: Row {
-            Text {
-                text: modelData.name
-            }
-
-            Text {
-                text: modelData.value()
-            }
-        }
-    }*/
 }

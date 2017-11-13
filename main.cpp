@@ -6,10 +6,9 @@
 #include "filemodel.h"
 #include "addressrange.h"
 #include "interpretermodel.h"
-
-#include "qmlglobal.h"
-
 #include "base_interpreters.h"
+//#include "sectionslist.h"
+#include "qmlglobal.h"
 
 int main(int argc, char *argv[])
 {
@@ -24,6 +23,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<FileModel>       ("ReverseEngi", 1, 0, "FileModel");
     qmlRegisterType<AddressRange>    ("ReverseEngi", 1, 0, "AddressRange");
     qmlRegisterType<InterpreterModel>("ReverseEngi", 1, 0, "InterpreterModel");
+    //qmlRegisterType<SectionsList>    ("ReverseEngi", 1, 0, "SectionsList");
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("G", new QmlGlobal);

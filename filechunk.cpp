@@ -16,11 +16,13 @@ FileChunk::~FileChunk()
     delete _rows;
 }
 
-std::vector<char> FileChunk::getData(int offset, int size) const
+QByteArray FileChunk::getData(int offset, int size) const
 {
-    Q_ASSERT(offset >= 0 && offset + size < _size);
+    if (_size < offset + size)
+        size = _size - offset;
 
-    return std::vector<char>(_data + offset, _data + offset + size);
+    Q_ASSERT(offset >= 0 && size > 0);
+    return QByteArray(_data + offset, size);
 }
 
 int FileChunk::size() const

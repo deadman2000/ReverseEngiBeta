@@ -4,14 +4,13 @@ Item {
     width: list.contentItem.childrenRect.width
     height: parent.height
 
-    property real textPadding: 8
+    property real textPadding: 4
+    property real symWith: G.hexLetter.width
 
-    property real symWith: hexLetter.width * 2
-
-    function symPos(coord)  // Координаты символа
+    function symPos(coord)
     {
-        return Qt.point(Math.round(coord.x * (hexLetter.width*3) + textPadding),
-                        Math.round(coord.y * rowHeight - contentY))
+        return Qt.point(Math.round(coord.x * symWith + textPadding),
+                        Math.round(coord.y * rowHeight - list.contentY))
     }
 
     function symAt(point)  // Символ по координатам
@@ -20,7 +19,7 @@ Item {
         var y = point.y + list.contentY
 
         // Номер символа в строке
-        var sym = Math.round(x / (hexLetter.width*3) - 0.5)
+        var sym = Math.round(x / G.hexLetter.width - 0.5)
         if (sym > 15) sym = 15
 
         var it = list.itemAt(x, y)
@@ -31,35 +30,28 @@ Item {
     property alias model: list.model
     property alias contentY: list.contentY
 
+    SectionDrawer { }
+
     ListView {
         id: list
-        anchors.fill: parent
         interactive: false
+        anchors.fill: parent
         spacing: 0
 
         header: Item { height: listTopPadding; width: 1 }
 
         delegate:
             HexText {
-                text: hex
+                text: fileText
                 height: rowHeight
                 leftPadding: textPadding
                 rightPadding: textPadding
 
                 property int rowIndex: index
-
-                /*Rectangle {
-                    color: Qt.rgba(0,1,0,0.1)
-                    border.color: 'gray'
-                    border.width: 1
-                    anchors.fill: parent
-                }*/
             }
 
         footer: Item { height: list.height; width: 1 }
     }
-
-    SectionDrawer { paddingX: hexLetter.width / 2; }
 
     CursorRect { }
 

@@ -4,9 +4,21 @@ AddressRange::AddressRange(QObject *parent)
     : QObject(parent)
     , _begin(-1)
     , _end(-1)
+    , _isSet(false)
 {
-
 }
+
+AddressRange::AddressRange(QObject * parent, int begin, int end, QColor bgrColor, QColor borderColor, int borderWidth)
+    : QObject(parent)
+    , _begin(begin)
+    , _end(end)
+    , _color(bgrColor)
+    , _borderColor(borderColor)
+    , _borderWidth(borderWidth)
+{
+}
+
+int AddressRange::begin() const { return _begin; }
 
 void AddressRange::setBegin(int begin)
 {
@@ -14,8 +26,12 @@ void AddressRange::setBegin(int begin)
         _begin = begin;
         emit beginChanged(begin);
         emit changed();
+        updateIsSet();
+        emit sizeChanged(size());
     }
 }
+
+int AddressRange::end() const { return _end; }
 
 void AddressRange::setEnd(int end)
 {
@@ -23,7 +39,14 @@ void AddressRange::setEnd(int end)
         _end = end;
         emit endChanged(end);
         emit changed();
+        updateIsSet();
+        emit sizeChanged(size());
     }
+}
+
+int AddressRange::size() const {
+    if (!isSet()) return 0;
+    return _end - _begin + 1;
 }
 
 void AddressRange::reset()
@@ -32,11 +55,21 @@ void AddressRange::reset()
     _end = -1;
 
     emit changed();
+    updateIsSet();
+    emit sizeChanged(size());
+}
+
+void AddressRange::updateIsSet()
+{
+    bool oldIsSet = _isSet;
+    _isSet = _begin != -1 && _end != -1;
+    if (_isSet != oldIsSet)
+        emit isSetChanged(_isSet);
 }
 
 bool AddressRange::isSet() const
 {
-    return _begin != -1 && _end != -1;
+    return _isSet;
 }
 
 QColor AddressRange::color() const

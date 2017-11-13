@@ -2,6 +2,7 @@ import QtQuick 2.7
 
 MouseArea {
     anchors.fill: parent
+    acceptedButtons: Qt.LeftButton
 
     onPressed: {
         var p = symAt(mouse)

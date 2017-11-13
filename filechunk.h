@@ -1,6 +1,8 @@
 #ifndef FILECHUNK_H
 #define FILECHUNK_H
 
+#include <QByteArray>
+
 class FileData;
 
 class FileChunk
@@ -15,7 +17,7 @@ public:
     FileChunk(const char * data, int size, int rowSize);
     ~FileChunk();
 
-    std::vector<char> getData(int offset, int size) const;
+    QByteArray getData(int offset, int size) const;
 
     int size() const;
 
