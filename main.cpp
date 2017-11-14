@@ -23,7 +23,6 @@ int main(int argc, char *argv[])
     qmlRegisterType<FileModel>       ("ReverseEngi", 1, 0, "FileModel");
     qmlRegisterType<AddressRange>    ("ReverseEngi", 1, 0, "AddressRange");
     qmlRegisterType<InterpreterModel>("ReverseEngi", 1, 0, "InterpreterModel");
-    //qmlRegisterType<SectionsList>    ("ReverseEngi", 1, 0, "SectionsList");
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("G", new QmlGlobal);

@@ -92,9 +92,10 @@ Item {
         anchors.fill: parent
         spacing: 0
 
-        Item {
+        Rectangle {
             width: 16
-            height: 1
+            height: parent.height
+            color: '#EEEEEE'
         }
 
         AddressList {
@@ -102,9 +103,10 @@ Item {
             contentY: listContentY
         }
 
-        Item {
+        Rectangle {
             width: 32
-            height: 1
+            height: parent.height
+            color: '#EEEEEE'
         }
 
         HexList {

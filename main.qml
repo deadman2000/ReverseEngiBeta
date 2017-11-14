@@ -1,13 +1,13 @@
 import QtQuick 2.7
 import QtQuick.Controls 2.2
-import QtQuick.Controls.Material 2.1
 import QtQuick.Layouts 1.3
+import "docking"
 import "fileview"
 
 ApplicationWindow {
     id: window
     visible: true
-    width: 1024
+    width: 1200
     height: 768
     title: qsTr("Hello World")
 
@@ -57,49 +57,41 @@ ApplicationWindow {
 
     property var currentFile: fileView
 
-    RowLayout {
+    DockSplit {
         anchors.fill: parent
-        spacing: 0
+        orientation: Qt.Horizontal
 
-        Item {
-            Layout.fillHeight: true
-            width: 300
+        DockSplit {
+            orientation: Qt.Vertical
+            dockWidth: 300
 
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: 0
+            DockPanel {
+                title: "Structure"
 
                 Rectangle {
                     color: 'gray'
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
+                    anchors.fill: parent
                 }
+            }
 
-                Item {
-                    Layout.fillWidth: true
-                    height: 4
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.SplitVCursor
-                    }
-                }
+            DockPanel {
+                title: "Data interpreter"
+                dockHeight: 300
 
                 Interpreter {
-                    Layout.fillWidth: true
+                    anchors.fill: parent
                 }
             }
         }
 
-        FileView {
-            id: fileView
-            focus: true
-
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+        DockPanel {
+            title: "File"
+            FileView {
+                id: fileView
+                anchors.fill: parent
+            }
         }
     }
-
 
     DropArea {
         anchors.fill: parent

@@ -13,5 +13,7 @@
         <file>fileview/Interpreter.qml</file>
         <file>fileview/FileView.qml</file>
         <file>docking/DockPanel.qml</file>
+        <file>docking/DockSplit.qml</file>
+        <file>docking/DockContainer.qml</file>
     </qresource>
 </RCC>

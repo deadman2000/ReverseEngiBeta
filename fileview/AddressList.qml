@@ -1,8 +1,10 @@
 import QtQuick 2.7
 
-Item {
+Rectangle {
     width: list.contentItem.childrenRect.width
     height: parent.height
+
+    color: '#EEEEEE'
 
     property alias model: list.model
     property alias contentY: list.contentY
@@ -29,6 +31,7 @@ Item {
             HexText {
                 text: address
                 height: rowHeight
+                color: Qt.rgba(0,0,0,0.54)
 
                 property int rowIndex: index
             }
