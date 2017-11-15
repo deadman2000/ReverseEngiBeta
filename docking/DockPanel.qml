@@ -14,6 +14,7 @@ DockContainer {
             height: 24
             color: '#424242'
             visible: title.length > 0
+            z: 1
 
             Text {
                 id: titleLabel

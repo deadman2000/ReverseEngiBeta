@@ -1,18 +1,20 @@
 import QtQuick 2.7
+import QtQuick.Controls 1.4
 import QtQuick.Layouts 1.3
 
-DockContainer {
+SplitView  {
     id: splitter
-    property int orientation: Qt.Horizontal
-    default property alias children: grid.children
+    handleDelegate: Item {}
 
-    GridLayout {
-        id: grid
-        anchors.fill: parent
-        rowSpacing: 0
-        columnSpacing: 0
-        flow: orientation == Qt.Horizontal ? GridLayout.LeftToRight : GridLayout.TopToBottom
+    property int dockHeight: 0
+    property int dockWidth: 0
 
-        property alias splitter: splitter
-    }
+    height: dockHeight
+    width: dockWidth
+
+    Layout.fillHeight: dockHeight == 0
+    Layout.fillWidth: dockWidth == 0
+
+    Layout.minimumHeight: 100
+    Layout.minimumWidth: 100
 }

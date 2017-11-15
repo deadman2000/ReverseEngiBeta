@@ -10,7 +10,7 @@ https://reverseengineering.stackexchange.com/questions/6003/visualizing-elf-bina
 - Переключение вида hex/text
 - Выбор кодировки
 - Столбцы в шестнадцатеричной таблице
-- Докинг
+- Открытие нескольких файлов
 
 # Features
 

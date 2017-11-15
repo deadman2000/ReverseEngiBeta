@@ -60,6 +60,8 @@ ApplicationWindow {
     DockSplit {
         anchors.fill: parent
         orientation: Qt.Horizontal
+        focus: true
+        Keys.onPressed: fileView.handleKey(event)
 
         DockSplit {
             orientation: Qt.Vertical
@@ -86,6 +88,7 @@ ApplicationWindow {
 
         DockPanel {
             title: "File"
+
             FileView {
                 id: fileView
                 anchors.fill: parent

@@ -125,8 +125,8 @@ Item {
         }
     }
 
-    Keys.onPressed: {
-        if (event.modifiers == Qt.NoModifier){
+    function handleKey(event) {
+        if (event.modifiers === Qt.NoModifier){
             switch (event.key)
             {
             case Qt.Key_Return:
@@ -166,7 +166,7 @@ Item {
             default:
                 return;
             }
-        } else if (event.modifiers == Qt.ControlModifier){
+        } else if (event.modifiers === Qt.ControlModifier){
             switch (event.key)
             {
             case Qt.Key_C:
