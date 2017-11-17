@@ -2,6 +2,52 @@
 #include "base_interpreters.h"
 #include "instruments.h"
 
+class NumberInterpreter : public BaseDataInterpreter {
+public:
+    virtual QString name() const override
+    {
+        return QString("%1%2 bytes").arg(_signed ? "±" : "+").arg(_size);
+    }
+
+    virtual QString toString(IDataSource * dataSource, int offset) const override
+    {
+        auto data = dataSource->getData(offset, _size);
+        if (data.size() != _size) return QString();
+
+        if (_signed)
+            return QString::number(getValue<qulonglong>(data), _base);
+        else
+            return QString::number(getValue<qlonglong>(data), _base);
+    }
+
+    template<typename T>
+    T getValue(QByteArray & data) const
+    {
+        T val = 0;
+        if (_byte_order_be)
+        {
+            for (int i=0; i<data.size(); i++)
+            {
+                val |= data[i] << (8 * i);
+            }
+        }
+        else
+        {
+            for (int i=0, n=data.size() - 1; n>=0; i++, n--)
+            {
+                val |= data[i] << (8 * n);
+            }
+        }
+        return val;
+    }
+
+private:
+    unsigned char _size; // Количество байт
+    unsigned char _base; // Система счисления для перевода в строку
+    bool _signed;        // Знаковость. True - Знаковый
+    bool _byte_order_be; // Порядок байт. True - Big Endian
+};
+
 class SByteInterpreter : public BaseDataInterpreter {
 public:
     virtual QString name() const override
@@ -68,6 +114,7 @@ public:
     }
 };
 
+// #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 /*bool runtimeIsLittleEndian()
 {
     volatile uint16_t i=1;

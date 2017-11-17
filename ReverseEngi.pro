@@ -13,16 +13,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += main.cpp \
-    filemodel.cpp \
-    filechunk.cpp \
-    filedata.cpp \
     addressrange.cpp \
-    base_interpreters.cpp \
     idatasource.cpp \
-    instruments.cpp \
-    qmlglobal.cpp \
-    basedatainterpreter.cpp \
-    interpretermodel.cpp
+	instruments.cpp \
+    qmlglobal.cpp
 
 RESOURCES += qml.qrc
 
@@ -38,18 +32,16 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    filemodel.h \
-    filechunk.h \
-    filedata.h \
-    stdafx.h \
     addressrange.h \
     idatasource.h \
-    instruments.h \
-    base_interpreters.h \
+	instruments.h \
     qmlglobal.h \
-    basedatainterpreter.h \
-    interpretermodel.h
+    stdafx.h
 
 PRECOMPILED_HEADER += stdafx.h
 
 OTHER_FILES += README.md
+
+include(filemodel/filemodel.pri)
+include(interpreter/interpreter.pri)
+include(structure/structure.pri)

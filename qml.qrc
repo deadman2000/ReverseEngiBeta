@@ -10,10 +10,14 @@
         <file>fileview/SectionDrawer.qml</file>
         <file>fileview/CursorRect.qml</file>
         <file>fileview/SelectionArea.qml</file>
-        <file>fileview/Interpreter.qml</file>
         <file>fileview/FileView.qml</file>
         <file>docking/DockPanel.qml</file>
         <file>docking/DockSplit.qml</file>
         <file>docking/DockContainer.qml</file>
+        <file>menu/MaterialMenu.qml</file>
+        <file>menu/MaterialMenuItem.qml</file>
+        <file>menu/MainMenu.qml</file>
+        <file>interpreter/Interpreter.qml</file>
+        <file>structure/StructureView.qml</file>
     </qresource>
 </RCC>

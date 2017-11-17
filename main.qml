@@ -3,6 +3,9 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 import "docking"
 import "fileview"
+import "menu"
+import "interpreter"
+import "structure"
 
 ApplicationWindow {
     id: window
@@ -21,6 +24,43 @@ ApplicationWindow {
 
     function pointToAddress(point) {
         return point.y * 16 + point.x
+    }
+
+    header: ToolBar {
+        //height: 24
+
+        RowLayout {
+            anchors.fill: parent
+
+            ToolButton {
+                text: qsTr("Action 1")
+            }
+            ToolButton {
+                text: qsTr("Action 2")
+            }
+
+            ToolSeparator {}
+
+            ToolButton {
+                text: qsTr("Action 3")
+            }
+            ToolButton {
+                text: qsTr("Action 4")
+            }
+
+            ToolSeparator {}
+
+            ToolButton {
+                text: qsTr("Action 5")
+            }
+            ToolButton {
+                text: qsTr("Action 6")
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
+        }
     }
 
     footer: ToolBar { // StatusBar
@@ -67,22 +107,11 @@ ApplicationWindow {
             orientation: Qt.Vertical
             dockWidth: 300
 
-            DockPanel {
-                title: "Structure"
-
-                Rectangle {
-                    color: 'gray'
-                    anchors.fill: parent
-                }
+            StructureView {
             }
 
-            DockPanel {
-                title: "Data interpreter"
+            Interpreter {
                 dockHeight: 300
-
-                Interpreter {
-                    anchors.fill: parent
-                }
             }
         }
 

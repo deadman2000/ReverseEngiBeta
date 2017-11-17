@@ -2,6 +2,7 @@ import QtQuick 2.7
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 import ReverseEngi 1.0
+import "../menu"
 
 Item {
     id: fileView
@@ -245,36 +246,37 @@ Item {
         onPositionChanged: if (pressed) setScroll(position / (1 - size))
     }
 
-    Menu {
+    MaterialMenu {
         id: menu
 
-        MenuItem {
+        MaterialMenuItem {
             text: "Mark selection"
             enabled: selection.isSet
             onTriggered: markSelection()
         }
 
-        MenuItem {
+        MaterialMenuItem {
             text: "Copy"
             enabled: selection.isSet
             onTriggered: copyToClipboard()
         }
 
-        MenuItem {
+        MaterialMenuItem {
             text: "Paste"
             onTriggered: console.log('Paste')
         }
 
-        MenuSeparator { }
+        MenuSeparator {
+        }
 
-        MenuItem {
+        MaterialMenuItem {
             text: "More Stuff"
             onTriggered: moreMenu.open()
 
-            Menu {
+            MaterialMenu {
                 x: parent.width
                 id: moreMenu
-                MenuItem {
+                MaterialMenuItem {
                     text: "Do Nothing"
                 }
             }

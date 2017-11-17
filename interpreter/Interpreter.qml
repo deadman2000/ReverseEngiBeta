@@ -2,12 +2,10 @@ import QtQuick 2.7
 import QtQuick.Window 2.3
 import QtQuick.Controls 1.4
 import ReverseEngi 1.0
+import "../docking"
 
-Item {
-    width: 300
-    height: 300
-    //x: 0
-    //y: 0
+DockPanel {
+    title: "Data interpreter"
 
     TableView {
         anchors.fill: parent

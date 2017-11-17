@@ -2,6 +2,49 @@ https://reverseengineering.stackexchange.com/questions/6003/visualizing-elf-bina
 
 # TODO
 
+- Структура
+    - простые типы
+    - группировка в блоки
+    - сохранение структуры в файл
+    - Сделать структуру PE формата https://ru.wikipedia.org/wiki/Portable_Executable  http://www.delorie.com/djgpp/doc/exe/
+
+Block - набор байтов. Фиксированный размер или по условию (null-term string)
+    name
+    description
+    + toString
+    + isValid
+    + asInt
+    + getSize
+
+Производные классы:
+Number
+    sign
+    byte_order
+Text
+    terminator
+Blob
+    format - ссылка на формат данных, если есть
+Sector - набор блоков. Может располагаться после какого-то сектора или начала файла
+    offset   - выражение определяющее позицию относительно начала файла (или родительского блока). Пример: my_sector.end + my_block_offset
+    list<Block>
+
+Варианты задания оффсета:
+- константа
+- позиция от конца другого сектора
+- значение свойства
+- позиция от конца другого сектора + значение свойства
+- JS выражение
+
+http://doc.qt.io/qt-5/qjsengine.html
+QJSEngine myEngine;
+QJSValue three = myEngine.evaluate("1 + 2");
+
+- Дерево http://doc.qt.io/qt-5.9/qstandarditemmodel.html
+
+- В интерпретаторе сделать тип - число с возможностью выбирать размер, знаковость и порядок байт
+- Добавлять в интерпретатор
+
+
 - Вынести константы в свойства (число символов в строке)
 - StatusBar (hex)
 - Открытие файла через меню
