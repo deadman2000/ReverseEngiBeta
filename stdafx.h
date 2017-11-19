@@ -2,6 +2,8 @@
 #define STDAFX_H
 
 #include <memory>
+
+#include <QObject>
 #include <QString>
 #include <QDebug>
 

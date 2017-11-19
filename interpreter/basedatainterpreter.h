@@ -2,7 +2,6 @@
 #define IDATAINTERPRETER_H
 
 #include "idatasource.h"
-#include <QString>
 
 class BaseDataInterpreter
 {

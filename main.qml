@@ -74,7 +74,7 @@ ApplicationWindow {
 
             Label {
                 Layout.fillWidth: true
-                text: currentFile.fileModel.fileName
+                text: currentFile.document.fileName
             }
 
             Label {
@@ -92,7 +92,7 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
-        fileView.openFile('c:/Windows/explorer.exe')
+        currentFile.openFile('c:/Windows/explorer.exe')
     }
 
     property var currentFile: fileView
@@ -101,7 +101,7 @@ ApplicationWindow {
         anchors.fill: parent
         orientation: Qt.Horizontal
         focus: true
-        Keys.onPressed: fileView.handleKey(event)
+        Keys.onPressed: currentFile.handleKey(event)
 
         DockSplit {
             orientation: Qt.Vertical
@@ -115,13 +115,8 @@ ApplicationWindow {
             }
         }
 
-        DockPanel {
-            title: "File"
-
-            FileView {
-                id: fileView
-                anchors.fill: parent
-            }
+        FileView {
+            id: fileView
         }
     }
 
@@ -135,7 +130,7 @@ ApplicationWindow {
         }
         onDropped: {
             if (drop.hasUrls){
-                fileView.openFile(drop.urls)
+                currentFile.openFile(drop.urls)
             }
         }
     }

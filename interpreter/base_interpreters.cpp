@@ -99,7 +99,7 @@ public:
             {
                 substr.truncate(n + 1);
                 data.append(substr);
-                return QString(data);
+                break;
             }
 
             data.append(substr);
@@ -110,7 +110,45 @@ public:
             offset += BLOCK_SIZE;
         }
 
-        return "";
+        return QString::fromLocal8Bit(data);
+    }
+};
+
+class UTFStringZeroTermInterpreter : public BaseDataInterpreter {
+public:
+    virtual QString name() const override
+    {
+        return "UTF-8 null-terminated";
+    }
+
+    virtual QString toString(IDataSource * dataSource, int offset) const override
+    {
+        const int BLOCK_COUNT = 16;
+        const int BLOCK_SIZE = 16;
+
+        QByteArray data;
+        for (int i=0; i<BLOCK_COUNT; i++)
+        {
+            auto substr = dataSource->getData(offset, BLOCK_SIZE);
+
+            int n = substr.indexOf('\0');
+
+            if (n != -1)
+            {
+                substr.truncate(n + 1);
+                data.append(substr);
+                break;
+            }
+
+            data.append(substr);
+
+            if (substr.size() < BLOCK_SIZE)
+                break;
+
+            offset += BLOCK_SIZE;
+        }
+
+        return QString::fromUtf8(data);
     }
 };
 
@@ -127,4 +165,5 @@ void init_base_interpreters()
     instr.registerInterpreter(new SByteInterpreter);
     instr.registerInterpreter(new UByteInterpreter);
     instr.registerInterpreter(new StringZeroTermInterpreter);
+    instr.registerInterpreter(new UTFStringZeroTermInterpreter);
 }

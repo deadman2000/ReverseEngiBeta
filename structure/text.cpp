@@ -1,6 +1,8 @@
 #include "text.h"
 
-Text::Text()
-{
+namespace structure {
 
+    Text::Text()
+    {
+    }
 }

@@ -3,11 +3,11 @@
 #include <QQmlContext>
 #include <QFontDatabase>
 
+#include "filedocument.h"
 #include "filemodel.h"
 #include "addressrange.h"
 #include "interpretermodel.h"
 #include "base_interpreters.h"
-//#include "sectionslist.h"
 #include "qmlglobal.h"
 
 int main(int argc, char *argv[])
@@ -20,8 +20,10 @@ int main(int argc, char *argv[])
     QFontDatabase fontDatabase;
     fontDatabase.addApplicationFont(":/fonts/CamingoCode.ttf");
 
+    qmlRegisterType<FileDocument>    ("ReverseEngi", 1, 0, "FileDocument");
     qmlRegisterType<FileModel>       ("ReverseEngi", 1, 0, "FileModel");
     qmlRegisterType<AddressRange>    ("ReverseEngi", 1, 0, "AddressRange");
+    qmlRegisterType<AreaStyle>       ("ReverseEngi", 1, 0, "AreaStyle");
     qmlRegisterType<InterpreterModel>("ReverseEngi", 1, 0, "InterpreterModel");
 
     QQmlApplicationEngine engine;

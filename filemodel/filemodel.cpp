@@ -32,6 +32,11 @@ public:
         , rowCount(0)
     {}
 
+    ~FileModelImpl()
+    {
+        delete[] chunks;
+    }
+
     void openFile(const QString &path)
     {
         if (file){
@@ -140,11 +145,6 @@ int FileModel::rows() const
     return impl->rowCount;
 }
 
-QString &FileModel::fileName() const
-{
-    return impl->filePath;
-}
-
 int FileModel::rowCount(const QModelIndex &) const
 {
     return impl->rowCount;
@@ -173,8 +173,6 @@ QVariant FileModel::data(const QModelIndex &index, int role) const
 
 void FileModel::openFile(const QString &path)
 {
-    _sections.clear();
-
     QString filePath = path;
 
     QUrl url(path);
@@ -187,28 +185,12 @@ void FileModel::openFile(const QString &path)
 
     emit sizeChanged(size());
     emit rowsChanged(rows());
-    emit fileNameChanged(impl->filePath);
 }
 
 
 QByteArray FileModel::getData(int offset, int size)
 {
     return impl->getData(offset, size);
-}
-
-int FileModel::sectionCount() const
-{
-    return _sections.size();
-}
-
-AddressRange *FileModel::section(int index) const
-{
-    return _sections.at(index);
-}
-
-void FileModel::addSection(int begin, int end)
-{
-    _sections.append(new AddressRange(this, begin, end, QColor(0, 255, 0, 25), QColor(0, 255, 0), 2));
 }
 
 void FileModel::copyToClipboard(int begin, int end)

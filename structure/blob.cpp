@@ -1,6 +1,9 @@
 #include "blob.h"
 
-Blob::Blob()
-{
+namespace structure {
+
+    Blob::Blob()
+    {
+    }
 
 }

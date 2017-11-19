@@ -6,16 +6,15 @@ AddressRange::AddressRange(QObject *parent)
     , _end(-1)
     , _isSet(false)
 {
+    _style = new AreaStyle(this);
 }
 
 AddressRange::AddressRange(QObject * parent, int begin, int end, QColor bgrColor, QColor borderColor, int borderWidth)
     : QObject(parent)
     , _begin(begin)
     , _end(end)
-    , _color(bgrColor)
-    , _borderColor(borderColor)
-    , _borderWidth(borderWidth)
 {
+    _style = new AreaStyle(this, bgrColor, borderColor, borderWidth);
 }
 
 int AddressRange::begin() const { return _begin; }
@@ -72,35 +71,13 @@ bool AddressRange::isSet() const
     return _isSet;
 }
 
-QColor AddressRange::color() const
+AreaStyle *AddressRange::style() const
 {
-    return _color;
+    return _style;
 }
 
-void AddressRange::setColor(QColor color)
+void AddressRange::setStyle(AreaStyle *style)
 {
-    _color = color;
-    emit colorChanged(color);
-}
-
-QColor AddressRange::borderColor() const
-{
-    return _borderColor;
-}
-
-void AddressRange::setBorderColor(QColor color)
-{
-    _borderColor = color;
-    emit borderColorChanged(color);
-}
-
-int AddressRange::borderWidth() const
-{
-    return _borderWidth;
-}
-
-void AddressRange::setBorderWidth(int width)
-{
-    _borderWidth = width;
-    emit borderWidthChanged(width);
+    _style = style;
+    emit styleChanged(style);
 }

@@ -16,7 +16,9 @@ SOURCES += main.cpp \
     addressrange.cpp \
     idatasource.cpp \
 	instruments.cpp \
-    qmlglobal.cpp
+    qmlglobal.cpp \
+    filedocument.cpp \
+    areastyle.cpp
 
 RESOURCES += qml.qrc
 
@@ -36,7 +38,9 @@ HEADERS += \
     idatasource.h \
 	instruments.h \
     qmlglobal.h \
-    stdafx.h
+    stdafx.h \
+    filedocument.h \
+    areastyle.h
 
 PRECOMPILED_HEADER += stdafx.h
 

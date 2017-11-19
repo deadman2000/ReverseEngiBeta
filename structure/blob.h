@@ -1,11 +1,16 @@
 #ifndef BLOB_H
 #define BLOB_H
 
+#include "block.h"
 
-class Blob : public Block
-{
-public:
-    Blob();
-};
+namespace structure {
+
+    class Blob : public Block
+    {
+    public:
+        Blob();
+    };
+
+}
 
 #endif // BLOB_H

@@ -3,7 +3,7 @@ import QtQuick.Layouts 1.3
 
 DockContainer {
     property alias title: titleLabel.text
-    default property alias children: content.children
+    default property alias data: content.data
 
     ColumnLayout {
         anchors.fill: parent

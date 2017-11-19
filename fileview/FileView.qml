@@ -2,30 +2,35 @@ import QtQuick 2.7
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 import ReverseEngi 1.0
+import "../docking"
 import "../menu"
 
-Item {
+DockPanel {
     id: fileView
+    title: "File"
 
     property AddressRange selection: AddressRange
     {
-        color: Qt.rgba(1, 0, 0, 0.1)
-        borderColor: Qt.rgba(1, 0, 0)
-        borderWidth: 2
+        style: AreaStyle {
+            color: Qt.rgba(1, 0, 0, 0.1)
+            borderColor: Qt.rgba(1, 0, 0)
+            borderWidth: 2
+        }
     }
 
-    property alias fileModel: fileModel
+    property alias document: document
+    property alias fileModel: document.data
     property alias cursor: cursor
 
-    FileModel {
-        id: fileModel
+    FileDocument {
+        id: document
     }
 
     function openFile(path)
     {
         cursor.offset = 0
         selection.reset()
-        fileModel.openFile(path)
+        document.openFile(path)
     }
 
     property int topRow: 0
@@ -55,7 +60,7 @@ Item {
     {
         if (!selection.isSet) return
 
-        fileModel.addSection(selection.begin, selection.end)
+        document.addSection(selection.begin, selection.end)
         selection.reset()
     }
 

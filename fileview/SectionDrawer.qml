@@ -16,20 +16,22 @@ Canvas { // Отрисовка секций файла
     property int paddingX: 0
     property int paddingY: 0
 
-    function drawSection(ctx, section)
+    function drawSection(ctx, section, style)
     {
+        if (!style) style = section.style
+
         var start = addressToPoint(section.begin)
         var end   = addressToPoint(section.end)
 
         if (start.y > topRow + rowsInScreen || end.y < topRow)
             return
 
-        ctx.fillStyle = section.color
-        ctx.strokeStyle = section.borderColor
-        ctx.lineWidth = section.borderWidth
+        ctx.fillStyle = style.color
+        ctx.strokeStyle = style.borderColor
+        ctx.lineWidth = style.borderWidth
 
         ctx.resetTransform();
-        if (section.borderWidth % 2 == 1) // Workaround
+        if (style.borderWidth % 2 == 1) // Workaround
             ctx.translate(0.5, 0.5)
 
         var px = paddingX
@@ -93,7 +95,7 @@ Canvas { // Отрисовка секций файла
         if (selection.isSet)
             drawSection(ctx, selection)
 
-        for (var i=0; i<fileModel.sectionCount; ++i)
-            drawSection(ctx, fileModel.section(i))
+        for (var i=0; i<document.sectionCount; ++i)
+            drawSection(ctx, document.section(i))
     }
 }
