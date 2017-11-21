@@ -8,9 +8,15 @@ AreaStyle::AreaStyle(QObject *parent)
 {
 }
 
-AreaStyle::AreaStyle(QObject *parent, QColor bgrColor, QColor borderColor, int borderWidth)
-    : QObject(parent)
-    , _color(bgrColor)
+AreaStyle::AreaStyle(QColor bgrColor)
+    : _color(bgrColor)
+    , _borderColor(Qt::transparent)
+    , _borderWidth(0)
+{
+}
+
+AreaStyle::AreaStyle(QColor bgrColor, QColor borderColor, int borderWidth)
+    : _color(bgrColor)
     , _borderColor(borderColor)
     , _borderWidth(borderWidth)
 {

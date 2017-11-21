@@ -9,9 +9,11 @@ namespace structure {
     {
     protected:
         IDataSource * _dataSource;
-        int _offset;
+        int _offset; // Позиция в файле. Если < 0, позиция не известна
         QString _name;
         QString _description;
+        bool _isValid;
+        int _size;
 
     public:
         Block();
@@ -19,7 +21,12 @@ namespace structure {
         virtual ~Block();
 
         void setDataSource(IDataSource * dataSource);
+
         void setOffset(int offset);
+        int offset() const;
+        int endOffset() const;
+
+        const QString & name() const;
         void setName(const QString & name);
         void setDescription(const QString & description);
 
@@ -27,10 +34,10 @@ namespace structure {
 
         virtual bool isValid() const;
 
-        virtual int getSize() const = 0;
+        int getSize() const;
 
     protected:
-        virtual void updateData() = 0;
+        virtual bool updateData() = 0;
     };
 
 }

@@ -14,13 +14,12 @@ namespace structure {
         // Block interface
     public:
         virtual QString toString() const override;
-        virtual int getSize() const override;
 
-        int count() const;
         void append(Block * block);
+        const QList<Block *> & childs() const;
 
     protected:
-        virtual void updateData() override;
+        virtual bool updateData() override;
     private:
         QList<Block *> _childs;
     };

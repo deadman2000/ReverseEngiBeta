@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "base_interpreters.h"
 #include "instruments.h"
+#include "convert.h"
 
 class NumberInterpreter : public BaseDataInterpreter {
 public:
@@ -15,30 +16,19 @@ public:
         if (data.size() != _size) return QString();
 
         if (_signed)
-            return QString::number(getValue<qulonglong>(data), _base);
-        else
-            return QString::number(getValue<qlonglong>(data), _base);
-    }
-
-    template<typename T>
-    T getValue(QByteArray & data) const
-    {
-        T val = 0;
-        if (_byte_order_be)
         {
-            for (int i=0; i<data.size(); i++)
-            {
-                val |= data[i] << (8 * i);
-            }
+            if (_byte_order_be)
+                return QString::number(getValueBE<qulonglong>(data), _base);
+            else
+                return QString::number(getValueLE<qulonglong>(data), _base);
         }
         else
         {
-            for (int i=0, n=data.size() - 1; n>=0; i++, n--)
-            {
-                val |= data[i] << (8 * n);
-            }
+            if (_byte_order_be)
+                return QString::number(getValueBE<qlonglong>(data), _base);
+            else
+                return QString::number(getValueLE<qlonglong>(data), _base);
         }
-        return val;
     }
 
 private:

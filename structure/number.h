@@ -5,22 +5,24 @@
 
 namespace structure {
 
+    struct ValueHolder;
+
     class Number : public Block
     {
-        int _size;
         bool _order_big_endian;
         bool _signed;
-        qlonglong _value;
+        ValueHolder * _value;
 
     public:
         Number();
+        virtual ~Number() override;
+
+        void setSize(int size);
 
         virtual QString toString() const override;
-        virtual bool isValid() const override;
-        virtual int getSize() const override;
 
     protected:
-        virtual void updateData() override;
+        virtual bool updateData() override;
     };
 }
 

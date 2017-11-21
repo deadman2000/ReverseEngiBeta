@@ -5,16 +5,28 @@ AddressRange::AddressRange(QObject *parent)
     , _begin(-1)
     , _end(-1)
     , _isSet(false)
+    , _style(nullptr)
+    , _selectedStyle(nullptr)
+    , _selected(false)
 {
-    _style = new AreaStyle(this);
+    setStyle(new AreaStyle(this));
+
+    _selectedStyle = new AreaStyle(this);
+    _selectedStyle->setColor(QColor(255, 0, 0, 25));
 }
 
-AddressRange::AddressRange(QObject * parent, int begin, int end, QColor bgrColor, QColor borderColor, int borderWidth)
+AddressRange::AddressRange(QObject * parent, int begin, int end)
     : QObject(parent)
     , _begin(begin)
     , _end(end)
+    , _style(nullptr)
+    , _selectedStyle(nullptr)
+    , _selected(false)
 {
-    _style = new AreaStyle(this, bgrColor, borderColor, borderWidth);
+    setStyle(new AreaStyle(this));
+
+    _selectedStyle = new AreaStyle(this);
+    _selectedStyle->setColor(QColor(255, 0, 0, 25));
 }
 
 int AddressRange::begin() const { return _begin; }
@@ -23,10 +35,8 @@ void AddressRange::setBegin(int begin)
 {
     if (_begin != begin){
         _begin = begin;
-        emit beginChanged(begin);
-        emit changed();
         updateIsSet();
-        emit sizeChanged(size());
+        emit changed();
     }
 }
 
@@ -36,10 +46,8 @@ void AddressRange::setEnd(int end)
 {
     if (_end != end){
         _end = end;
-        emit endChanged(end);
-        emit changed();
         updateIsSet();
-        emit sizeChanged(size());
+        emit changed();
     }
 }
 
@@ -53,17 +61,14 @@ void AddressRange::reset()
     _begin = -1;
     _end = -1;
 
-    emit changed();
     updateIsSet();
-    emit sizeChanged(size());
+    emit changed();
 }
 
 void AddressRange::updateIsSet()
 {
     bool oldIsSet = _isSet;
     _isSet = _begin != -1 && _end != -1;
-    if (_isSet != oldIsSet)
-        emit isSetChanged(_isSet);
 }
 
 bool AddressRange::isSet() const
@@ -73,11 +78,28 @@ bool AddressRange::isSet() const
 
 AreaStyle *AddressRange::style() const
 {
+    if (_selected)
+        return _selectedStyle;
     return _style;
 }
 
 void AddressRange::setStyle(AreaStyle *style)
 {
+    if (_style) _style->deleteLater();
     _style = style;
-    emit styleChanged(style);
+    _style->setParent(this);
+
+    unselect();
+}
+
+void AddressRange::select()
+{
+    _selected = true;
+    emit changed();
+}
+
+void AddressRange::unselect()
+{
+    _selected = false;
+    emit changed();
 }

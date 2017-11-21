@@ -5,12 +5,7 @@ Canvas { // Отрисовка секций файла
 
     Connections {
         target: fileView
-        onTopRowChanged: requestPaint()
-    }
-
-    Connections {
-        target: selection
-        onChanged: requestPaint()
+        onSectionsChanged: requestPaint()
     }
 
     property int paddingX: 0
@@ -18,14 +13,13 @@ Canvas { // Отрисовка секций файла
 
     function drawSection(ctx, section, style)
     {
-        if (!style) style = section.style
-
         var start = addressToPoint(section.begin)
         var end   = addressToPoint(section.end)
 
         if (start.y > topRow + rowsInScreen || end.y < topRow)
             return
 
+        if (!style) style = section.style
         ctx.fillStyle = style.color
         ctx.strokeStyle = style.borderColor
         ctx.lineWidth = style.borderWidth
@@ -44,6 +38,8 @@ Canvas { // Отрисовка секций файла
         var endPos   = symPos(end)
         var erx = endPos.x + symWith + px
 
+        ctx.beginPath()
+
         if (start.y === end.y){
             // Выделение на одной строке
             ctx.rect(sx, sy, erx - sx, rowHeight + py*2)
@@ -56,20 +52,21 @@ Canvas { // Отрисовка секций файла
 
             if (start.y === end.y - 1 && start.x > end.x) {
                 // Выделение на двух строках в разных прямоугольниках
-                /*  |              |sP       |s1x
-                    |e1x    eP|erx           |     */
+                /*  |             sP_________|
+                    |_________     |_________|s1x
+                    |e1x____eP|erx           |     */
 
                 ctx.rect(sx, sy, s1x - sx, rowHeight + py*2)
                 ctx.rect(e1x, ey, erx - e1x, rowHeight + py*2)
             } else {
                 // Выделение в несколько строк одним 8-угольником
-                /*  |        |sP             |s1x
-                    |e1x            eP|erx   |     */
+                /*  |       sP_______________|
+                    |________|               |s1x
+                    |                  ______|
+                    |e1x____________eP|erx   |     */
 
                 var eby = endPos.y + rowHeight + py
                 var sby = startPos.y + rowHeight + py
-
-                ctx.beginPath()
 
                 ctx.moveTo(sx, sy);
                 ctx.lineTo(s1x, sy);
@@ -79,11 +76,10 @@ Canvas { // Отрисовка секций файла
                 ctx.lineTo(e1x, eby);
                 ctx.lineTo(e1x, sby);
                 ctx.lineTo(sx, sby);
-
-                ctx.closePath();
             }
         }
 
+        ctx.closePath();
         ctx.fill();
         ctx.stroke();
     }
@@ -92,10 +88,13 @@ Canvas { // Отрисовка секций файла
         var ctx = getContext("2d");
         ctx.reset()
 
+        for (var i=0; i<document.blocks.length; ++i)
+            drawSection(ctx, document.blocks[i])
+
+        for (var i=0; i<document.sections.length; ++i)
+            drawSection(ctx, document.sections[i])
+
         if (selection.isSet)
             drawSection(ctx, selection)
-
-        for (var i=0; i<document.sectionCount; ++i)
-            drawSection(ctx, document.section(i))
     }
 }

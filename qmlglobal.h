@@ -4,6 +4,7 @@
 #include "instruments.h"
 
 #include <QSize>
+#include <QModelIndex>
 
 class QmlGlobal : public QObject
 {

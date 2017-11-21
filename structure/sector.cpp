@@ -11,29 +11,42 @@ namespace structure {
         qDeleteAll(_childs);
     }
 
-    QString structure::Sector::toString() const
+    QString Sector::toString() const
     {
         return QString();
     }
 
-    int structure::Sector::getSize() const
-    {
-        return 0;
-    }
-
-    int Sector::count() const
-    {
-        return _childs.count();
-    }
-
     void Sector::append(Block *block)
     {
-        block->setDataSource(_dataSource);
-        block->setOffset(0); // TODO Calc offset
         _childs.append(block);
+
+        block->setDataSource(_dataSource);
+        if (_isValid && _offset >= 0)
+        {
+            block->setOffset(_offset + _size);
+            if (block->isValid())
+                _size += block->getSize();
+            else
+                _isValid = false;
+        }
     }
 
-    void structure::Sector::updateData()
+    const QList<Block *> &Sector::childs() const
     {
+        return _childs;
+    }
+
+    bool Sector::updateData()
+    {
+        _size = 0;
+        for (Block* block : _childs)
+        {
+            block->setOffset(_offset + _size);
+            if (block->isValid())
+                _size += block->getSize();
+            else
+                return false;
+        }
+        return true;
     }
 }

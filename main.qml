@@ -95,13 +95,24 @@ ApplicationWindow {
         currentFile.openFile('c:/Windows/explorer.exe')
     }
 
+    Dialog {
+        id: dialog
+        title: "Title"
+        modal: true
+        standardButtons: Dialog.Ok | Dialog.Cancel
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+
+        Label {
+            text: "Lorem ipsum..."
+        }
+    }
+
     property var currentFile: fileView
 
     DockSplit {
         anchors.fill: parent
         orientation: Qt.Horizontal
-        focus: true
-        Keys.onPressed: currentFile.handleKey(event)
 
         DockSplit {
             orientation: Qt.Vertical

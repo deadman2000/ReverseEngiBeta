@@ -11,7 +11,8 @@ class AreaStyle : public QObject
     Q_PROPERTY(int borderWidth READ borderWidth WRITE setBorderWidth NOTIFY borderWidthChanged)
 public:
     explicit AreaStyle(QObject *parent = nullptr);
-    AreaStyle(QObject *parent, QColor bgrColor, QColor borderColor, int borderWidth);
+    explicit AreaStyle(QColor bgrColor);
+    AreaStyle(QColor bgrColor, QColor borderColor, int borderWidth);
 
     QColor color() const;
     void setColor(QColor color);

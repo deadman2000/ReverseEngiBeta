@@ -5,6 +5,8 @@ DockContainer {
     property alias title: titleLabel.text
     default property alias data: content.data
 
+    property alias buttons: buttonsRow.children
+
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
@@ -16,11 +18,21 @@ DockContainer {
             visible: title.length > 0
             z: 1
 
-            Text {
-                id: titleLabel
-                color: '#FFFFFF'
-                x: 4
-                y: 6
+            RowLayout {
+                anchors.fill: parent
+                spacing: 0
+                anchors.leftMargin: 4
+                anchors.rightMargin: 4
+
+                Text {
+                    id: titleLabel
+                    color: 'white'
+                    Layout.fillWidth: true
+                }
+
+                RowLayout {
+                    id: buttonsRow
+                }
             }
         }
 

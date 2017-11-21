@@ -1,17 +1,21 @@
 #ifndef FILEDOCUMENT_H
 #define FILEDOCUMENT_H
 
+#include <QStandardItemModel>
+#include <QQmlListProperty>
+
 #include "filemodel.h"
 #include "addressrange.h"
-#include "structuremodel.h"
+#include "structure.h"
 
 class FileDocument : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString fileName READ fileName CONSTANT)
-    Q_PROPERTY(int sectionCount READ sectionCount)
     Q_PROPERTY(FileModel* data READ data CONSTANT)
-    Q_PROPERTY(StructureModel* structure READ structure CONSTANT)
+    Q_PROPERTY(QStandardItemModel* structure READ structure CONSTANT)
+    Q_PROPERTY(QQmlListProperty<AddressRange> blocks READ blocks CONSTANT)
+    Q_PROPERTY(QQmlListProperty<AddressRange> sections READ sections CONSTANT)
 
 public:
     FileDocument(QObject *parent = 0);
@@ -22,17 +26,31 @@ public:
 
     FileModel * data() const;
 
-    int sectionCount() const;
-    Q_INVOKABLE AddressRange* section(int index) const;
+    QQmlListProperty<AddressRange> sections();
+
     Q_INVOKABLE void addSection(int begin, int end);
 
-    StructureModel * structure() const;
+    void addSectorToTree(structure::Sector & s, QStandardItem *parentItem);
+    void buildStructure();
+    QStandardItemModel * structure() const;
+    QQmlListProperty<AddressRange> blocks();
+    Q_INVOKABLE void selectBlock(QModelIndex index);
+
+    void selectRange(AddressRange * range);
+
+signals:
+    void sectionsChanged();
 
 private:
     QString _fileName;
     FileModel * _data;
     QList<AddressRange*> _sections;
-    StructureModel * _structure;
+
+    structure::Sector _structure;
+    QStandardItemModel * _structureModel;
+    QList<AddressRange*> _blocks;
+
+    AddressRange* _selectedRange;
 };
 
 #endif // FILEDOCUMENT_H

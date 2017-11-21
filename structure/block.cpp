@@ -4,7 +4,8 @@ namespace structure {
 
     Block::Block()
         : _dataSource(nullptr)
-        , _offset(0)
+        , _offset(-1)
+        , _isValid(false)
     {
     }
 
@@ -20,12 +21,32 @@ namespace structure {
     void Block::setOffset(int offset)
     {
         _offset = offset;
-        updateData();
+        _isValid = updateData();
+    }
+
+    int Block::offset() const
+    {
+        return _offset;
+    }
+
+    int Block::endOffset() const
+    {
+        return _offset + _size - 1;
+    }
+
+    const QString &Block::name() const
+    {
+        return _name;
     }
 
     bool Block::isValid() const
     {
-        return true;
+        return _isValid;
+    }
+
+    int Block::getSize() const
+    {
+        return _size;
     }
 
     void Block::setName(const QString &name)

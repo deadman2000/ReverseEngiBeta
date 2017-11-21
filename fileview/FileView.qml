@@ -8,6 +8,7 @@ import "../menu"
 DockPanel {
     id: fileView
     title: "File"
+    focus: true
 
     property AddressRange selection: AddressRange
     {
@@ -16,6 +17,8 @@ DockPanel {
             borderColor: Qt.rgba(1, 0, 0)
             borderWidth: 2
         }
+
+        onChanged: sectionsChanged()
     }
 
     property alias document: document
@@ -26,6 +29,13 @@ DockPanel {
         id: document
     }
 
+    Connections {
+        target: document
+        onSectionsChanged: sectionsChanged()
+    }
+
+    signal sectionsChanged
+
     function openFile(path)
     {
         cursor.offset = 0
@@ -34,6 +44,8 @@ DockPanel {
     }
 
     property int topRow: 0
+    onTopRowChanged: sectionsChanged()
+
     property int listContentY: topRow * rowHeight - listTopPadding
     readonly property real scrollPosition: topRow / (fileModel.rows - rowsInScreen)
 
@@ -73,7 +85,7 @@ DockPanel {
 
     MouseArea {
         anchors.fill: parent
-        acceptedButtons: Qt.RightButton
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
 
         onWheel: {
             if (wheel.angleDelta.y < 0)
@@ -85,7 +97,9 @@ DockPanel {
         }
 
         onClicked: {
-            if (mouse.button == Qt.RightButton) {
+            fileView.forceActiveFocus()
+
+            if (mouse.button === Qt.RightButton) {
                 menu.x = mouse.x
                 menu.y = mouse.y
                 menu.open()
@@ -131,7 +145,7 @@ DockPanel {
         }
     }
 
-    function handleKey(event) {
+    Keys.onPressed: {
         if (event.modifiers === Qt.NoModifier){
             switch (event.key)
             {

@@ -40,7 +40,8 @@ HEADERS += \
     qmlglobal.h \
     stdafx.h \
     filedocument.h \
-    areastyle.h
+    areastyle.h \
+    convert.h
 
 PRECOMPILED_HEADER += stdafx.h
 

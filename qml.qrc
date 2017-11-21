@@ -19,5 +19,7 @@
         <file>menu/MainMenu.qml</file>
         <file>interpreter/Interpreter.qml</file>
         <file>structure/StructureView.qml</file>
+        <file>icons/ic_add_white_24px.svg</file>
+        <file>docking/DockButton.qml</file>
     </qresource>
 </RCC>
