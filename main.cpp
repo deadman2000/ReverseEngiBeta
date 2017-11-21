@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QFontDatabase>
+#include <QQuickStyle>
 
 #include "filedocument.h"
 #include "filemodel.h"
@@ -19,6 +20,11 @@ int main(int argc, char *argv[])
 
     QFontDatabase fontDatabase;
     fontDatabase.addApplicationFont(":/fonts/CamingoCode.ttf");
+    fontDatabase.addApplicationFont(":/fonts/Roboto-Regular.ttf");
+    fontDatabase.addApplicationFont(":/fonts/Roboto-Medium.ttf");
+
+    QFont font("Roboto");
+    app.setFont(font);
 
     qmlRegisterType<FileDocument>    ("ReverseEngi", 1, 0, "FileDocument");
     qmlRegisterType<FileModel>       ("ReverseEngi", 1, 0, "FileModel");
@@ -26,11 +32,16 @@ int main(int argc, char *argv[])
     qmlRegisterType<AreaStyle>       ("ReverseEngi", 1, 0, "AreaStyle");
     qmlRegisterType<InterpreterModel>("ReverseEngi", 1, 0, "InterpreterModel");
 
+    QQuickStyle::setStyle("qrc:/style");
+    QQuickStyle::setFallbackStyle("Material");
+
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("G", new QmlGlobal);
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
-    if (engine.rootObjects().isEmpty())
+    if (engine.rootObjects().isEmpty()){
+        qWarning() << "No root";
         return -1;
+    }
 
     return app.exec();
 }
