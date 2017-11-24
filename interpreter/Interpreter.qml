@@ -3,11 +3,12 @@ import QtQuick.Window 2.3
 import QtQuick.Controls 1.4
 import ReverseEngi 1.0
 import "../docking"
+import ".."
 
 DockPanel {
     title: "Data interpreter"
 
-    TableView {
+    CustomTable {
         anchors.fill: parent
 
         TableViewColumn {

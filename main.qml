@@ -3,7 +3,6 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 import "docking"
 import "fileview"
-import "menu"
 import "interpreter"
 import "structure"
 
@@ -27,34 +26,27 @@ ApplicationWindow {
     }
 
     header: ToolBar {
-        //height: 24
-
         RowLayout {
             anchors.fill: parent
 
             ToolButton {
-                text: qsTr("Action 1")
-            }
-            ToolButton {
-                text: qsTr("Action 2")
+                text: qsTr("File")
             }
 
-            ToolSeparator {}
-
             ToolButton {
-                text: qsTr("Action 3")
-            }
-            ToolButton {
-                text: qsTr("Action 4")
+                text: qsTr("Edit")
             }
 
-            ToolSeparator {}
+            ToolButton {
+                text: qsTr("Tools")
+            }
 
             ToolButton {
-                text: qsTr("Action 5")
+                text: qsTr("Window")
             }
+
             ToolButton {
-                text: qsTr("Action 6")
+                text: qsTr("Help")
             }
 
             Item {
@@ -93,19 +85,6 @@ ApplicationWindow {
 
     Component.onCompleted: {
         currentFile.openFile('c:/Windows/explorer.exe')
-    }
-
-    Dialog {
-        id: dialog
-        title: "Title"
-        modal: true
-        standardButtons: Dialog.Ok | Dialog.Cancel
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
-
-        Label {
-            text: "Lorem ipsum..."
-        }
     }
 
     property var currentFile: fileView

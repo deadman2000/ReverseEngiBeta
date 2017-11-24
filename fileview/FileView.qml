@@ -3,7 +3,6 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 import ReverseEngi 1.0
 import "../docking"
-import "../menu"
 
 DockPanel {
     id: fileView
@@ -13,8 +12,8 @@ DockPanel {
     property AddressRange selection: AddressRange
     {
         style: AreaStyle {
-            color: Qt.rgba(1, 0, 0, 0.1)
-            borderColor: Qt.rgba(1, 0, 0)
+            color: Qt.rgba(1,0,0,0.1)
+            borderColor: Qt.rgba(1,0,0)
             borderWidth: 2
         }
 
@@ -49,7 +48,7 @@ DockPanel {
     property int listContentY: topRow * rowHeight - listTopPadding
     readonly property real scrollPosition: topRow / (fileModel.rows - rowsInScreen)
 
-    readonly property int rowsInScreen: height / rowHeight
+    readonly property int rowsInScreen: contentItem.height / rowHeight
 
 
     function setScroll(value) {
@@ -265,22 +264,22 @@ DockPanel {
         onPositionChanged: if (pressed) setScroll(position / (1 - size))
     }
 
-    MaterialMenu {
+    Menu {
         id: menu
 
-        MaterialMenuItem {
+        MenuItem {
             text: "Mark selection"
             enabled: selection.isSet
             onTriggered: markSelection()
         }
 
-        MaterialMenuItem {
+        MenuItem {
             text: "Copy"
             enabled: selection.isSet
             onTriggered: copyToClipboard()
         }
 
-        MaterialMenuItem {
+        MenuItem {
             text: "Paste"
             onTriggered: console.log('Paste')
         }
@@ -288,14 +287,14 @@ DockPanel {
         MenuSeparator {
         }
 
-        MaterialMenuItem {
+        MenuItem {
             text: "More Stuff"
             onTriggered: moreMenu.open()
 
-            MaterialMenu {
+            Menu {
                 x: parent.width
                 id: moreMenu
-                MaterialMenuItem {
+                MenuItem {
                     text: "Do Nothing"
                 }
             }

@@ -15,7 +15,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp \
     addressrange.cpp \
     idatasource.cpp \
-	instruments.cpp \
+    instruments.cpp \
     qmlglobal.cpp \
     filedocument.cpp \
     areastyle.cpp
@@ -36,7 +36,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     addressrange.h \
     idatasource.h \
-	instruments.h \
+    instruments.h \
     qmlglobal.h \
     stdafx.h \
     filedocument.h \

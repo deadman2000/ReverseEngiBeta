@@ -1,5 +1,3 @@
-https://reverseengineering.stackexchange.com/questions/6003/visualizing-elf-binaries/6006
-
 # TODO
 
 - Структура
@@ -47,8 +45,9 @@ QJSValue three = myEngine.evaluate("1 + 2");
 - Визуализация
     - 2D рендер
     - 3D рендер
+    https://reverseengineering.stackexchange.com/questions/6003/visualizing-elf-binaries/6006
 - База данных типов
-- Правило определения типа
+- Правило определения формата файла
 - Проект
 - Конфигурирования и стилизация
     - Выбор цвета, размера, шрифта

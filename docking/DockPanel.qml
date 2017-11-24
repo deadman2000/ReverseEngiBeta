@@ -1,8 +1,10 @@
 import QtQuick 2.7
 import QtQuick.Layouts 1.3
+import QtQuick.Controls.Material 2.2
 
 DockContainer {
     property alias title: titleLabel.text
+    property alias contentItem: content
     default property alias data: content.data
 
     property alias buttons: buttonsRow.children
@@ -15,6 +17,7 @@ DockContainer {
             Layout.fillWidth: true
             height: 24
             color: '#424242'
+            //color: Material.accent
             visible: title.length > 0
             z: 1
 
@@ -28,6 +31,8 @@ DockContainer {
                     id: titleLabel
                     color: 'white'
                     Layout.fillWidth: true
+                    font.pixelSize: 12
+                    renderType: Text.NativeRendering
                 }
 
                 RowLayout {

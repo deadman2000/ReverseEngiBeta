@@ -67,7 +67,6 @@ void AddressRange::reset()
 
 void AddressRange::updateIsSet()
 {
-    bool oldIsSet = _isSet;
     _isSet = _begin != -1 && _end != -1;
 }
 

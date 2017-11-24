@@ -14,13 +14,23 @@
         <file>docking/DockPanel.qml</file>
         <file>docking/DockSplit.qml</file>
         <file>docking/DockContainer.qml</file>
-        <file>menu/MaterialMenu.qml</file>
-        <file>menu/MaterialMenuItem.qml</file>
-        <file>menu/MainMenu.qml</file>
         <file>interpreter/Interpreter.qml</file>
         <file>structure/StructureView.qml</file>
         <file>icons/ic_add_white_24px.svg</file>
         <file>docking/DockButton.qml</file>
         <file>style/ToolButton.qml</file>
+        <file>style/Menu.qml</file>
+        <file>style/MenuItem.qml</file>
+        <file>style/Button.qml</file>
+        <file>style/ToolBar.qml</file>
+        <file>style/Dialog.qml</file>
+        <file>CustomTreeStyle.qml</file>
+        <file>icons/ic_arrow_drop_down_black_24px.svg</file>
+        <file>CustomTable.qml</file>
+        <file>structure/EditBlockDialog.qml</file>
+        <file>structure/NumberEditor.qml</file>
+        <file>structure/TextEditor.qml</file>
+        <file>structure/BlobEditor.qml</file>
+        <file>structure/SectorEditor.qml</file>
     </qresource>
 </RCC>

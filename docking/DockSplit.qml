@@ -4,7 +4,12 @@ import QtQuick.Layouts 1.3
 
 SplitView  {
     id: splitter
-    handleDelegate: Item {}
+
+    handleDelegate: Rectangle {
+        color: splitter.orientation == Qt.Vertical ? 'transparent' : 'black'
+        width: 1
+        height: 1
+    }
 
     property int dockHeight: 0
     property int dockWidth: 0

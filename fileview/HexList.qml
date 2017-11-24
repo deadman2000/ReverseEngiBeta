@@ -49,13 +49,6 @@ Item {
                 rightPadding: textPadding
 
                 property int rowIndex: index
-
-                /*Rectangle {
-                    color: Qt.rgba(0,1,0,0.1)
-                    border.color: 'gray'
-                    border.width: 1
-                    anchors.fill: parent
-                }*/
             }
 
         footer: Item { height: list.height; width: 1 }

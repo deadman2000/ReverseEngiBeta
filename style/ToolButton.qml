@@ -27,8 +27,8 @@ T.ToolButton {
     }
 
     background: Ripple {
-        implicitWidth: 48
-        implicitHeight: 48
+        implicitWidth: 24
+        implicitHeight: 24
 
         readonly property bool square: control.contentItem.implicitWidth <= control.contentItem.implicitHeight
 
