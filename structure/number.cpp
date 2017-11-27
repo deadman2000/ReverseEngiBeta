@@ -39,10 +39,9 @@ namespace structure {
             delete _value;
     }
 
-    void Number::setSize(int size)
+    int Number::typeID() const
     {
-        Q_ASSERT(size > 0);
-        _size = size;
+        return 0;
     }
 
     QString Number::toString() const
@@ -98,4 +97,17 @@ namespace structure {
         return true;
     }
 
+    void Number::readAttr(const QJsonObject &json)
+    {
+        _order_big_endian = json["bigendian"].toBool();
+        _signed = json["signed"].toBool();
+        _size = json["size"].toInt();
+    }
+
+    void Number::writeAttr(QJsonObject &json)
+    {
+        json["bigendian"] = _order_big_endian;
+        json["signed"] = _signed;
+        json["size"] = _size;
+    }
 }

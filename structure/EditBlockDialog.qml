@@ -12,6 +12,8 @@ Window {
 
     Component.onCompleted: typeEditor.updateContent()
 
+    property bool _editMode: false
+
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
@@ -22,6 +24,7 @@ Window {
             Layout.margins: 32
 
             TextField {
+                id: teName
                 placeholderText: "Name"
                 Layout.fillWidth: true
             }
@@ -71,13 +74,35 @@ Window {
         DialogButtonBox {
             Layout.fillWidth: true
             standardButtons: DialogButtonBox.Ok | DialogButtonBox.Cancel
-            onAccepted: if (validate()) dialog.close()
+            onAccepted: {
+                if (!validate() || !typeEditor.item.validate()) return;
+
+                var ind = tree.selection.currentIndex
+                var typeId = cbType.currentIndex
+                var attr = typeEditor.item.attrs()
+                attr['name'] = teName.text.trim()
+
+                if (_editMode)
+                    currentFile.document.editBlock(ind, typeId, attr)
+                else
+                    currentFile.document.addBlock(ind, typeId, attr)
+                dialog.close()
+            }
             onRejected: dialog.close()
         }
     }
 
     function validate()
     {
-        return true;
+        return teName.text.trim().length > 0
+    }
+
+    function fillForm(obj)
+    {
+        _editMode = true
+        teName.text = obj['name']
+        cbType.currentIndex = obj['type']
+        typeEditor.updateContent()
+        typeEditor.item.fillForm(obj)
     }
 }

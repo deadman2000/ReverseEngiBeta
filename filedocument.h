@@ -30,13 +30,20 @@ public:
 
     Q_INVOKABLE void addSection(int begin, int end);
 
-    void addSectorToTree(structure::Sector & s, QStandardItem *parentItem);
     void buildStructure();
     QStandardItemModel * structure() const;
     QQmlListProperty<AddressRange> blocks();
+    Q_INVOKABLE void addBlock(QModelIndex parentIndex, int type, const QVariantMap & attrs);
+    Q_INVOKABLE void editBlock(QModelIndex index, int type, const QVariantMap & attrs);
     Q_INVOKABLE void selectBlock(QModelIndex index);
+    Q_INVOKABLE QVariant getBlock(QModelIndex index);
+    Q_INVOKABLE bool saveStructure(const QString & fileName);
+    Q_INVOKABLE bool loadStructure(const QString & fileName);
 
     void selectRange(AddressRange * range);
+
+private:
+    void addSectorToTree(structure::Sector & s, QStandardItem *parentItem);
 
 signals:
     void sectionsChanged();

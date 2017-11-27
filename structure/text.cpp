@@ -9,9 +9,9 @@ namespace structure {
         //setCodec("KOI8-R");
     }
 
-    void Text::setSize(int size)
+    int Text::typeID() const
     {
-        _size = size;
+        return 1;
     }
 
     QString Text::toString() const
@@ -35,5 +35,15 @@ namespace structure {
     bool Text::updateData()
     {
         return true;
+    }
+
+    void Text::readAttr(const QJsonObject &json)
+    {
+        setSize(json["size"].toInt());
+    }
+
+    void Text::writeAttr(QJsonObject &json)
+    {
+        json["size"] = _size;
     }
 }

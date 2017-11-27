@@ -1,5 +1,6 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.4
+import QtQuick 2.7
+import QtQuick.Controls 1.4 as C1
+import QtQuick.Controls 2.2
 import QtQml.Models 2.2
 import "../docking"
 import ".."
@@ -10,20 +11,32 @@ DockPanel {
     buttons: [
         DockButton {
             icon: 'qrc:icons/ic_add_white_24px.svg'
-            onClicked: openEditDialog()
+            onClicked: createBlock()
         }
     ]
 
     property var __editDialogComp: null
-    function openEditDialog()
+    function createEditDialog()
     {
         if (!__editDialogComp)
             __editDialogComp = Qt.createComponent('EditBlockDialog.qml')
-        var dialog = __editDialogComp.createObject(window);
+        return __editDialogComp.createObject(window);
+    }
+
+    function createBlock()
+    {
+        createEditDialog().show()
+    }
+
+    function editBlock()
+    {
+        var dialog = createEditDialog()
+        var obj = currentFile.document.getBlock(tree.selection.currentIndex)
+        dialog.fillForm(obj)
         dialog.show()
     }
 
-    TreeView {
+    C1.TreeView {
         id: tree
         anchors.fill: parent
         model: currentFile.document.structure
@@ -41,18 +54,41 @@ DockPanel {
             onPressed: {
                 var ind = tree.indexAt(mouse.x, mouse.y)
                 tree.selection.setCurrentIndex(ind, 0x10);
-                // TODO Context menu
+
+                ctxMenu.x = mouse.x
+                ctxMenu.y = mouse.y
+                ctxMenu.open()
             }
         }
 
-        TableViewColumn {
+        onDoubleClicked: editBlock()
+
+        C1.TableViewColumn {
             title: "Name"
             role: "display"
         }
 
-        TableViewColumn {
+        C1.TableViewColumn {
             title: "Value"
             role: "value"
+        }
+    }
+
+    Menu {
+        id: ctxMenu
+
+        MenuItem {
+            text: "Add block"
+            onTriggered: createBlock()
+        }
+
+        MenuItem {
+            text: "Edit block"
+            onTriggered: editBlock()
+        }
+
+        MenuItem {
+            text: "Delete"
         }
     }
 }

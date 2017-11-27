@@ -11,7 +11,7 @@ namespace structure {
     public:
         Text();
 
-        void setSize(int size);
+        virtual int typeID() const override;
 
         QString toString() const override;
 
@@ -19,6 +19,8 @@ namespace structure {
 
     protected:
         bool updateData() override;
+        virtual void readAttr(const QJsonObject &json) override;
+        virtual void writeAttr(QJsonObject &json) override;
 
     private:
         QByteArray _terminator;

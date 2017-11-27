@@ -17,12 +17,14 @@ namespace structure {
         Number();
         virtual ~Number() override;
 
-        void setSize(int size);
+        virtual int typeID() const override;
 
         virtual QString toString() const override;
 
     protected:
         virtual bool updateData() override;
+        void readAttr(const QJsonObject &json) override;
+        void writeAttr(QJsonObject &json) override;
     };
 }
 

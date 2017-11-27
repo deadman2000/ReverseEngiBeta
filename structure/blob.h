@@ -9,6 +9,15 @@ namespace structure {
     {
     public:
         Blob();
+
+        virtual int typeID() const override;
+        virtual QString toString() const override;
+        virtual bool isValid() const override;
+
+    protected:
+        virtual bool updateData() override;
+        virtual void readAttr(const QJsonObject &json) override;
+        virtual void writeAttr(QJsonObject &json) override;
     };
 
 }
