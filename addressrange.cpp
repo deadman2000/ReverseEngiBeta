@@ -29,6 +29,10 @@ AddressRange::AddressRange(QObject * parent, int begin, int end)
     _selectedStyle->setColor(QColor(255, 0, 0, 25));
 }
 
+AddressRange::~AddressRange()
+{
+}
+
 int AddressRange::begin() const { return _begin; }
 
 void AddressRange::setBegin(int begin)

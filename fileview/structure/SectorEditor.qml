@@ -5,7 +5,6 @@ Item {
         return true
     }
 
-
     function attrs(){
         return { }
     }

@@ -50,14 +50,30 @@ namespace structure {
         return _offset + _size - 1;
     }
 
-    const QString &Block::name() const
+    int Block::size() const
     {
-        return _name;
+        return _size;
+    }
+
+    void Block::setSize(int value)
+    {
+        Q_ASSERT(value >= 0);
+
+        if (_size != value)
+        {
+            _size = value;
+            if (_parent) _parent->updateData();
+        }
     }
 
     bool Block::isValid() const
     {
         return _isValid;
+    }
+
+    const QString &Block::name() const
+    {
+        return _name;
     }
 
     void Block::acceptJSON(const QJsonObject &json)
@@ -86,20 +102,11 @@ namespace structure {
         toJSON(json);
     }
 
-    int Block::size() const
+    void Block::remove()
     {
-        return _size;
-    }
+        Q_ASSERT(_parent != nullptr);
 
-    void Block::setSize(int value)
-    {
-        Q_ASSERT(value >= 0);
-
-        if (_size != value)
-        {
-            _size = value;
-            if (_parent) _parent->updateData();
-        }
+        _parent->remove(this);
     }
 
     Block *Block::create(int typeId)

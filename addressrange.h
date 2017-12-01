@@ -14,6 +14,7 @@ class AddressRange : public QObject
 public:
     explicit AddressRange(QObject *parent = nullptr);
     AddressRange(QObject * parent, int begin, int end);
+    ~AddressRange();
 
     int begin() const;
     void setBegin(int begin);

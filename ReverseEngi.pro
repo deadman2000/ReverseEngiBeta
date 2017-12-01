@@ -18,7 +18,8 @@ SOURCES += main.cpp \
     instruments.cpp \
     qmlglobal.cpp \
     filedocument.cpp \
-    areastyle.cpp
+    areastyle.cpp \
+    structuremodel.cpp
 
 RESOURCES += qml.qrc
 
@@ -41,7 +42,8 @@ HEADERS += \
     stdafx.h \
     filedocument.h \
     areastyle.h \
-    convert.h
+    convert.h \
+    structuremodel.h
 
 PRECOMPILED_HEADER += stdafx.h
 

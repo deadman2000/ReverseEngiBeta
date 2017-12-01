@@ -21,6 +21,7 @@ DockPanel {
     }
 
     property alias document: document
+    property alias structure: document.structure
     property alias fileModel: document.data
     property alias cursor: cursor
 
@@ -281,7 +282,22 @@ DockPanel {
 
         MenuItem {
             text: "Paste"
-            onTriggered: console.log('Paste')
+
+            MenuItem {
+                text: "Do Nothing"
+            }
+
+            MenuItem {
+                text: "Do Nothing"
+            }
+
+            MenuItem {
+                text: "Do Nothing"
+            }
+
+            MenuItem {
+                text: "Do Nothing"
+            }
         }
 
         MenuSeparator {
@@ -289,14 +305,33 @@ DockPanel {
 
         MenuItem {
             text: "More Stuff"
-            onTriggered: moreMenu.open()
 
-            Menu {
-                x: parent.width
-                id: moreMenu
+            MenuItem {
+                text: "Do more..."
+
                 MenuItem {
                     text: "Do Nothing"
                 }
+
+                MenuItem {
+                    text: "Do Nothing"
+                }
+
+                MenuItem {
+                    text: "Do Nothing"
+                }
+            }
+
+            MenuItem {
+                text: "Do Nothing"
+            }
+
+            MenuItem {
+                text: "Do Nothing"
+            }
+
+            MenuItem {
+                text: "Do Nothing"
             }
         }
     }

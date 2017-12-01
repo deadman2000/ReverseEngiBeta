@@ -11,6 +11,11 @@ namespace structure {
         return 2;
     }
 
+    QString Blob::typeName() const
+    {
+        return QString("blob");
+    }
+
     QString Blob::toString() const
     {
         return "";

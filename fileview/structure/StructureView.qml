@@ -2,8 +2,9 @@ import QtQuick 2.7
 import QtQuick.Controls 1.4 as C1
 import QtQuick.Controls 2.2
 import QtQml.Models 2.2
-import "../docking"
-import ".."
+import QtQuick.Controls.Material 2.2
+import "../../docking"
+import "../.."
 
 DockPanel {
     title: "Structure"
@@ -31,9 +32,14 @@ DockPanel {
     function editBlock()
     {
         var dialog = createEditDialog()
-        var obj = currentFile.document.getBlock(tree.selection.currentIndex)
+        var obj = tree.model.getBlock(tree.selection.currentIndex)
         dialog.fillForm(obj)
         dialog.show()
+    }
+
+    function deleteBlock()
+    {
+        tree.model.deleteBlock(tree.selection.currentIndex)
     }
 
     C1.TreeView {
@@ -45,7 +51,7 @@ DockPanel {
 
         selection: ItemSelectionModel {
             model: tree.model
-            onCurrentChanged: currentFile.document.selectBlock(currentIndex)
+            onCurrentChanged: model.selectBlock(currentIndex)
         }
 
         MouseArea {
@@ -64,14 +70,22 @@ DockPanel {
         onDoubleClicked: editBlock()
 
         C1.TableViewColumn {
+            title: "Type"
+            role: "type"
+            width: 64
+        }
+
+        C1.TableViewColumn {
             title: "Name"
-            role: "display"
+            role: "name"
+            width: 128
         }
 
         C1.TableViewColumn {
             title: "Value"
             role: "value"
         }
+
     }
 
     Menu {
@@ -89,6 +103,7 @@ DockPanel {
 
         MenuItem {
             text: "Delete"
+            onTriggered: deleteBlock()
         }
     }
 }

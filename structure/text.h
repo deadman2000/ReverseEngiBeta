@@ -12,6 +12,7 @@ namespace structure {
         Text();
 
         virtual int typeID() const override;
+        virtual QString typeName() const override;
 
         QString toString() const override;
 

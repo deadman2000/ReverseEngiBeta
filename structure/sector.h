@@ -13,6 +13,7 @@ namespace structure {
         virtual ~Sector() override;
 
         virtual int typeID() const override;
+        virtual QString typeName() const override;
 
         virtual void setDataSource(IDataSource *dataSource) override;
 
@@ -20,6 +21,7 @@ namespace structure {
 
         void append(Block * block);
         void replace(int index, Block * block);
+        void remove(Block * block);
         const QList<Block *> & childs() const;
 
         virtual void save(QJsonObject &json) override;

@@ -44,6 +44,23 @@ namespace structure {
         return 0;
     }
 
+    QString ctype(int size)
+    {
+        switch (size)
+        {
+        case 1: return "byte";
+        case 2: return "short";
+        case 4: return "int";
+        case 8: return "long";
+        default: return QString("%1 bytes").arg(size);
+        }
+    }
+
+    QString Number::typeName() const
+    {
+        return QString("%1%2").arg(_signed ? "" : "u").arg(ctype(_size));
+    }
+
     QString Number::toString() const
     {
         if (_value)
@@ -101,7 +118,7 @@ namespace structure {
     {
         _order_big_endian = json["bigendian"].toBool();
         _signed = json["signed"].toBool();
-        _size = json["size"].toInt();
+        setSize(json["size"].toInt());
     }
 
     void Number::writeAttr(QJsonObject &json)

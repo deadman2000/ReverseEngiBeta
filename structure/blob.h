@@ -11,6 +11,7 @@ namespace structure {
         Blob();
 
         virtual int typeID() const override;
+        virtual QString typeName() const override;
         virtual QString toString() const override;
         virtual bool isValid() const override;
 

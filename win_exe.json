@@ -1,0 +1,85 @@
+{
+    "childs": [
+        {
+            "name": "Signature",
+            "size": 2,
+            "type": 1
+        },
+        {
+            "bigendian": true,
+            "name": "some_value_1",
+            "signed": false,
+            "size": 2,
+            "type": 0
+        },
+        {
+            "bigendian": true,
+            "name": "some_value_2",
+            "signed": false,
+            "size": 2,
+            "type": 0
+        },
+        {
+            "bigendian": true,
+            "name": "some_value_3",
+            "signed": false,
+            "size": 2,
+            "type": 0
+        },
+        {
+            "bigendian": true,
+            "name": "some_value_4",
+            "signed": false,
+            "size": 2,
+            "type": 0
+        },
+        {
+            "bigendian": true,
+            "name": "some_value_5",
+            "signed": false,
+            "size": 2,
+            "type": 0
+        },
+        {
+            "childs": [
+                {
+                    "bigendian": true,
+                    "name": "sub_value_1",
+                    "signed": false,
+                    "size": 4,
+                    "type": 0
+                },
+                {
+                    "bigendian": true,
+                    "name": "sub_value_2",
+                    "signed": false,
+                    "size": 4,
+                    "type": 0
+                },
+                {
+                    "bigendian": true,
+                    "name": "sub_value_3",
+                    "signed": false,
+                    "size": 4,
+                    "type": 0
+                },
+                {
+                    "bigendian": true,
+                    "name": "sub_value_4",
+                    "signed": false,
+                    "size": 4,
+                    "type": 0
+                },
+                {
+                    "bigendian": true,
+                    "name": "sub_value_5",
+                    "signed": false,
+                    "size": 4,
+                    "type": 0
+                }
+            ],
+            "name": "Sector",
+            "type": 3
+        }
+    ]
+}

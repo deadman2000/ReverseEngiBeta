@@ -18,6 +18,7 @@ namespace structure {
         virtual ~Number() override;
 
         virtual int typeID() const override;
+        virtual QString typeName() const override;
 
         virtual QString toString() const override;
 

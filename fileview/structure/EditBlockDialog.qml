@@ -14,6 +14,8 @@ Window {
 
     property bool _editMode: false
 
+    property var structure: currentFile.document.structure
+
     ColumnLayout {
         anchors.fill: parent
         spacing: 0
@@ -40,6 +42,7 @@ Window {
             Loader {
                 id: typeEditor
                 Layout.fillWidth: true
+                onLoaded: if (formData) item.fillForm(formData)
 
                 function updateContent()
                 {
@@ -62,7 +65,6 @@ Window {
                         break;
                     }
                 }
-
             }
 
             Item {
@@ -83,9 +85,9 @@ Window {
                 attr['name'] = teName.text.trim()
 
                 if (_editMode)
-                    currentFile.document.editBlock(ind, typeId, attr)
+                    structure.editBlock(ind, typeId, attr)
                 else
-                    currentFile.document.addBlock(ind, typeId, attr)
+                    structure.addBlock(ind, typeId, attr)
                 dialog.close()
             }
             onRejected: dialog.close()
@@ -97,8 +99,11 @@ Window {
         return teName.text.trim().length > 0
     }
 
+    property var formData: null
+
     function fillForm(obj)
     {
+        formData = obj
         _editMode = true
         teName.text = obj['name']
         cbType.currentIndex = obj['type']

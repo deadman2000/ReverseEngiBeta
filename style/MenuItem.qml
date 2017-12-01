@@ -1,5 +1,6 @@
 import QtQuick 2.9
 import QtQuick.Templates 2.2 as T
+import QtQuick.Controls 2.2
 import QtQuick.Controls.Material 2.2
 import QtQuick.Controls.Material.impl 2.2
 
@@ -53,6 +54,53 @@ T.MenuItem {
             anchor: control
             active: control.down || control.visualFocus || control.hovered
             color: control.Material.rippleColor
+        }
+    }
+
+    default property list<Item> contentData
+
+    onTriggered: if (contentData.length > 0) {
+                   //menuLoader.item.open()
+               }
+
+    onHoveredChanged: {
+        if (contentData.length > 0) {
+          if (hovered) {
+              menuLoader.item.delayOpen()
+          } else {
+              menuLoader.item.stop()
+              menuLoader.item.close()
+          }
+        }
+    }
+
+    Loader {
+        id: menuLoader
+        active: contentData.length > 0
+        sourceComponent: menuComp
+        onLoaded: item.contentData = control.contentData
+    }
+
+    Component {
+        id: menuComp
+        Menu {
+            id: subMenu
+            x: control.width
+            transformOrigin: Item.TopLeft
+
+            function delayOpen() {
+                openTimer.start()
+            }
+
+            function stop() {
+                openTimer.stop()
+            }
+
+            Timer {
+                id: openTimer
+                interval: 200
+                onTriggered: subMenu.open()
+            }
         }
     }
 }

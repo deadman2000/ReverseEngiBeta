@@ -3,8 +3,8 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 import "docking"
 import "fileview"
-import "interpreter"
-import "structure"
+import "fileview/interpreter"
+import "fileview/structure"
 
 ApplicationWindow {
     id: window
@@ -25,27 +25,57 @@ ApplicationWindow {
         return point.y * 16 + point.x
     }
 
-    header: ToolBar {
-        RowLayout {
-            anchors.fill: parent
 
-            ToolButton {
+    header: MainMenu {
+            MainMenuItem {
                 text: qsTr("File")
+
+                MenuItem {
+                    text: qsTr("Item 1")
+
+                    MenuItem {
+                        text: qsTr("Sub item 1")
+                    }
+
+                    MenuItem {
+                        text: qsTr("Sub item 2")
+                    }
+
+                    MenuItem {
+                        text: qsTr("Sub item 3")
+                    }
+
+                    MenuItem {
+                        text: qsTr("Sub item 4")
+                    }
+                }
+
+                MenuItem {
+                    text: qsTr("Item 2")
+                }
+
+                MenuItem {
+                    text: qsTr("Item 3")
+                }
+
+                MenuItem {
+                    text: qsTr("Item 4")
+                }
             }
 
-            ToolButton {
+            MainMenuItem {
                 text: qsTr("Edit")
             }
 
-            ToolButton {
+            MainMenuItem {
                 text: qsTr("Tools")
             }
 
-            ToolButton {
+            MainMenuItem {
                 text: qsTr("Window")
             }
 
-            ToolButton {
+            MainMenuItem {
                 text: qsTr("Help")
             }
 
@@ -53,7 +83,6 @@ ApplicationWindow {
                 Layout.fillWidth: true
             }
         }
-    }
 
     footer: ToolBar { // StatusBar
         height: 24

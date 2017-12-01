@@ -41,6 +41,7 @@ T.Menu {
         clip: true
         keyNavigationWraps: false
         currentIndex: -1
+        boundsBehavior: Flickable.StopAtBounds
 
         ScrollIndicator.vertical: ScrollIndicator {}
     }

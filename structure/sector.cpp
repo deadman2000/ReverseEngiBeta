@@ -18,6 +18,11 @@ namespace structure {
         return 3;
     }
 
+    QString Sector::typeName() const
+    {
+        return "sector";
+    }
+
     void Sector::setDataSource(IDataSource *dataSource)
     {
         Block::setDataSource(dataSource);
@@ -45,6 +50,12 @@ namespace structure {
         delete _childs[index];
         _childs[index] = block;
         makeChild(block);
+    }
+
+    void Sector::remove(Block *block)
+    {
+        _childs.removeOne(block);
+        updateData();
     }
 
     void Sector::makeChild(Block *block)

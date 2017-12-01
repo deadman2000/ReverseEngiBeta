@@ -14,6 +14,11 @@ namespace structure {
         return 1;
     }
 
+    QString Text::typeName() const
+    {
+        return "text";
+    }
+
     QString Text::toString() const
     {
         if (_isValid)

@@ -88,8 +88,8 @@ Canvas { // Отрисовка секций файла
         var ctx = getContext("2d");
         ctx.reset()
 
-        for (var i=0; i<document.blocks.length; ++i)
-            drawSection(ctx, document.blocks[i])
+        for (var i=0; i<structure.blocks.length; ++i)
+            drawSection(ctx, structure.blocks[i])
 
         for (var i=0; i<document.sections.length; ++i)
             drawSection(ctx, document.sections[i])

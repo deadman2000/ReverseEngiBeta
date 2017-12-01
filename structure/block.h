@@ -25,6 +25,7 @@ namespace structure {
         virtual ~Block();
 
         virtual int typeID() const = 0;
+        virtual QString typeName() const = 0;
 
         virtual void setDataSource(IDataSource * dataSource);
 
@@ -35,20 +36,22 @@ namespace structure {
         int offset() const;
         int endOffset() const;
 
+        int size() const;
+        void setSize(int value);
+
+        virtual bool isValid() const;
+
         const QString & name() const;
         void setName(const QString & name);
         void setDescription(const QString & description);
 
         virtual QString toString() const = 0;
 
-        virtual bool isValid() const;
-
         void acceptJSON(const QJsonObject & json); // Применяет атрибуты и структу из JSON
         void toJSON(QJsonObject & json);           // Сохраняет атрибуты блока в JSON
         virtual void save(QJsonObject &json);              // Сохраняет полную структуру блока в JSON
 
-        int size() const;
-        void setSize(int value);
+        void remove();
 
         static Block* create(int typeId);
 
