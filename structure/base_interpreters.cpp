@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "base_interpreters.h"
-#include "instruments.h"
+#include "iengine.h"
 #include "convert.h"
 
 class NumberInterpreter : public BaseDataInterpreter {
@@ -151,9 +151,8 @@ public:
 
 void init_base_interpreters()
 {
-    auto & instr = Instruments::instance();
-    instr.registerInterpreter(new SByteInterpreter);
-    instr.registerInterpreter(new UByteInterpreter);
-    instr.registerInterpreter(new StringZeroTermInterpreter);
-    instr.registerInterpreter(new UTFStringZeroTermInterpreter);
+    engine().registerInterpreter(new SByteInterpreter);
+    engine().registerInterpreter(new UByteInterpreter);
+    engine().registerInterpreter(new StringZeroTermInterpreter);
+    engine().registerInterpreter(new UTFStringZeroTermInterpreter);
 }

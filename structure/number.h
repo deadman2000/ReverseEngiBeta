@@ -3,30 +3,27 @@
 
 #include "block.h"
 
-namespace structure {
+struct ValueHolder;
 
-    struct ValueHolder;
+class Number : public Block
+{
+    bool _order_big_endian;
+    bool _signed;
+    ValueHolder * _value;
 
-    class Number : public Block
-    {
-        bool _order_big_endian;
-        bool _signed;
-        ValueHolder * _value;
+public:
+    Number();
+    virtual ~Number() override;
 
-    public:
-        Number();
-        virtual ~Number() override;
+    virtual int typeID() const override;
+    virtual QString typeName() const override;
 
-        virtual int typeID() const override;
-        virtual QString typeName() const override;
+    virtual QString toString() const override;
 
-        virtual QString toString() const override;
-
-    protected:
-        virtual bool updateData() override;
-        void readAttr(const QJsonObject &json) override;
-        void writeAttr(QJsonObject &json) override;
-    };
-}
+protected:
+    virtual bool updateData() override;
+    void readAttr(const QJsonObject &json) override;
+    void writeAttr(QJsonObject &json) override;
+};
 
 #endif // NUMBER_H

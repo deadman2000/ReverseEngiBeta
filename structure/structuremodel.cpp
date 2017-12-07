@@ -26,26 +26,26 @@ StructureModel::StructureModel(QObject * parent, IDataSource * dataSource)
 
     // TODO Потом убрать
     /*{
-        auto * b = new structure::Text();
+        auto * b = new Text();
         b->setName("Signature");
         b->setSize(2);
         _root.append(b);
     }
     for (int i=1; i<=5; i++)
     {
-        auto * b = new structure::Number();
+        auto * b = new Number();
         b->setName(QString("some_value_%1").arg(i));
         b->setSize(2);
         _root.append(b);
     }
     {
-        auto * s = new structure::Sector();
+        auto * s = new Sector();
         s->setName("Sector");
         _root.append(s);
 
         for (int i=1; i<=5; i++)
         {
-            auto * b = new structure::Number();
+            auto * b = new Number();
             b->setName(QString("sub_value_%1").arg(i));
             b->setSize(4);
             s->append(b);
@@ -65,9 +65,9 @@ void StructureModel::buildStructure()
     emit sectionsChanged();
 }
 
-void StructureModel::addSectorToTree(structure::Sector & s, QStandardItem *parentItem)
+void StructureModel::addSectorToTree(Sector & s, QStandardItem *parentItem)
 {
-    for (structure::Block* b : s.childs())
+    for (Block* b : s.childs())
     {
         QStandardItem *item = new QStandardItem(b->name());
         item->setData(b->toString(), StructureValueRole);
@@ -75,7 +75,7 @@ void StructureModel::addSectorToTree(structure::Sector & s, QStandardItem *paren
         item->setData(qVariantFromValue((void*)b), StructureBlockRole);
         parentItem->appendRow(item);
 
-        if (structure::Sector * s = dynamic_cast<structure::Sector*>(b))
+        if (Sector * s = dynamic_cast<Sector*>(b))
             addSectorToTree(*s, item);
         else
         {
@@ -101,7 +101,7 @@ QVariant StructureModel::getBlock(QModelIndex index)
     QStandardItem * item = itemFromIndex(index);
     if (!item) return map;
 
-    structure::Block* b = (structure::Block*)item->data(StructureBlockRole).value<void*>();
+    Block* b = (Block*)item->data(StructureBlockRole).value<void*>();
 
     {
         QJsonObject obj;
@@ -152,18 +152,18 @@ bool StructureModel::loadStructure(const QString &fileName)
 
 void StructureModel::addBlock(QModelIndex parentIndex, int type, const QVariantMap &attrs)
 {
-    structure::Sector * parent = nullptr;
+    Sector * parent = nullptr;
     if (parentIndex.isValid())
     {
         QStandardItem * item = itemFromIndex(parentIndex);
-        structure::Block* b = (structure::Block*)item->data(StructureBlockRole).value<void*>();
-        parent = dynamic_cast<structure::Sector*>(b);
+        Block* b = (Block*)item->data(StructureBlockRole).value<void*>();
+        parent = dynamic_cast<Sector*>(b);
         if (!parent)
             parent = b->parent();
     }
     if (!parent) parent = &_root;
 
-    structure::Block * block = structure::Block::create(type);
+    Block * block = Block::create(type);
     QJsonDocument json(QJsonDocument::fromVariant(attrs));
     block->acceptJSON(json.object());
 
@@ -176,15 +176,15 @@ void StructureModel::editBlock(QModelIndex index, int type, const QVariantMap &a
     Q_ASSERT(index.isValid());
 
     QStandardItem * item = itemFromIndex(index);
-    auto * block = (structure::Block*)item->data(StructureBlockRole).value<void*>();
+    auto * block = (Block*)item->data(StructureBlockRole).value<void*>();
 
     if (block->typeID() != type)
     {
-        auto * old = block;
+        //auto * old = block;
         auto * parent = block->parent();
         int ind = parent->childs().indexOf(block);
         Q_ASSERT(ind != -1);
-        block = structure::Block::create(type);
+        block = Block::create(type);
         parent->replace(ind, block);
         //delete old; // Падает при удалении блока
     }
@@ -200,7 +200,7 @@ void StructureModel::deleteBlock(QModelIndex index)
     Q_ASSERT(index.isValid());
 
     QStandardItem * item = itemFromIndex(index);
-    auto * block = (structure::Block*)item->data(StructureBlockRole).value<void*>();
+    auto * block = (Block*)item->data(StructureBlockRole).value<void*>();
 
     block->remove();
 
@@ -212,7 +212,7 @@ void StructureModel::selectBlock(QModelIndex index)
     if (index.isValid())
     {
         QStandardItem * item = itemFromIndex(index);
-        //_currentBlock = (structure::Block*)item->data(StructureBlockRole).value<void*>();
+        //_currentBlock = (Block*)item->data(StructureBlockRole).value<void*>();
         AddressRange* range = (AddressRange*)item->data(StructureRangeRole).value<void*>();
         selectRange(range);
     }

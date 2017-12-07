@@ -1,12 +1,12 @@
 #include "interpretermodel.h"
 
-#include "instruments.h"
+#include "iengine.h"
 
 InterpreterModel::InterpreterModel()
     : QAbstractListModel()
     , _model(nullptr)
 {
-    _interpreters = Instruments::instance().interpreters();
+    _interpreters = engine().interpreters();
 }
 
 QHash<int, QByteArray> InterpreterModel::roleNames() const

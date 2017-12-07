@@ -30,14 +30,14 @@ public:
     Q_INVOKABLE bool loadStructure(const QString & fileName);
 
 private:
-    void addSectorToTree(structure::Sector & s, QStandardItem *parentItem);
+    void addSectorToTree(Sector & s, QStandardItem *parentItem);
     void selectRange(AddressRange * range);
 
 signals:
     void sectionsChanged();
 
 private:
-    structure::Sector _root;
+    Sector _root;
     QList<AddressRange*> _blocks;
     AddressRange* _selectedRange;
 };

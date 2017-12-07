@@ -7,11 +7,6 @@ QmlGlobal::QmlGlobal() : QObject(nullptr)
     updateFontSize();
 }
 
-Instruments * QmlGlobal::instruments() const
-{
-    return &(Instruments::instance());
-}
-
 void QmlGlobal::updateFontSize()
 {
     QFont codeFont("CamingoCode");

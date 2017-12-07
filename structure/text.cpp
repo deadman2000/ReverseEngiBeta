@@ -1,54 +1,51 @@
 #include "text.h"
 
-namespace structure {
+Text::Text()
+    : Block()
+    , codec(nullptr)
+{
+    //setCodec("KOI8-R");
+}
 
-    Text::Text()
-        : Block()
-        , codec(nullptr)
-    {
-        //setCodec("KOI8-R");
-    }
+int Text::typeID() const
+{
+    return 1;
+}
 
-    int Text::typeID() const
-    {
-        return 1;
-    }
+QString Text::typeName() const
+{
+    return "text";
+}
 
-    QString Text::typeName() const
+QString Text::toString() const
+{
+    if (_isValid)
     {
-        return "text";
+        QByteArray data = _dataSource->getData(_offset, _size);
+        if (codec)
+            return codec->toUnicode(data);
+        else
+            return QString::fromUtf8(data);
     }
+    return "";
+}
 
-    QString Text::toString() const
-    {
-        if (_isValid)
-        {
-            QByteArray data = _dataSource->getData(_offset, _size);
-            if (codec)
-                return codec->toUnicode(data);
-            else
-                return QString::fromUtf8(data);
-        }
-        return "";
-    }
+void Text::setCodec(const QByteArray &name)
+{
+    codec = QTextCodec::codecForName(name);
+}
 
-    void Text::setCodec(const QByteArray &name)
-    {
-        codec = QTextCodec::codecForName(name);
-    }
+bool Text::updateData()
+{
+    return true;
+}
 
-    bool Text::updateData()
-    {
-        return true;
-    }
+void Text::readAttr(const QJsonObject &json)
+{
+    setSize(json["size"].toInt());
+}
 
-    void Text::readAttr(const QJsonObject &json)
-    {
-        setSize(json["size"].toInt());
-    }
-
-    void Text::writeAttr(QJsonObject &json)
-    {
-        json["size"] = _size;
-    }
+void Text::writeAttr(QJsonObject &json)
+{
+    json["size"] = _size;
 }
