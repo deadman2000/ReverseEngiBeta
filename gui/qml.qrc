@@ -35,5 +35,8 @@
         <file>fileview/interpreter/Interpreter.qml</file>
         <file>MainMenu.qml</file>
         <file>MainMenuItem.qml</file>
+        <file>CustomTree.qml</file>
+        <file>main2.qml</file>
+        <file>icons/ic_folder_black_24px.svg</file>
     </qresource>
 </RCC>

@@ -1,5 +1,6 @@
 TEMPLATE = subdirs
-SUBDIRS += structure gui
+SUBDIRS = structure \
+    gui
 CONFIG += ordered
 
 OTHER_FILES += README.md
