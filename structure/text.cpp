@@ -45,7 +45,7 @@ void Text::readAttr(const QJsonObject &json)
     setSize(json["size"].toInt());
 }
 
-void Text::writeAttr(QJsonObject &json)
+void Text::writeAttr(QJsonObject &json) const
 {
     json["size"] = _size;
 }

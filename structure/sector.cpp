@@ -1,6 +1,8 @@
 #include "sector.h"
 
 #include <QJsonArray>
+#include <QFile>
+#include <QJsonDocument>
 
 Sector::Sector()
 {
@@ -38,6 +40,12 @@ QString Sector::toString() const
 void Sector::append(Block *block)
 {
     _childs.append(block);
+    makeChild(block);
+}
+
+void Sector::insert(int index, Block *block)
+{
+    _childs.insert(index, block);
     makeChild(block);
 }
 
@@ -114,7 +122,46 @@ void Sector::readAttr(const QJsonObject &json)
     }
 }
 
-void Sector::save(QJsonObject &json)
+bool Sector::load(const QString &fileName)
+{
+    qDebug() << "Load" << fileName;
+    QFile file(fileName);
+
+    if (!file.exists()){
+        qWarning() << QString("File %1 not found").arg(fileName);
+        return false;
+    }
+
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning("Couldn't open save file.");
+        return false;
+    }
+
+    QJsonDocument doc(QJsonDocument::fromJson(file.readAll()));
+    acceptJSON(doc.object());
+
+    return true;
+}
+
+bool Sector::save(const QString &fileName) const
+{
+    QFile file(fileName);
+
+    if (!file.open(QIODevice::WriteOnly)) {
+        qWarning("Couldn't open save file.");
+        return false;
+    }
+
+    QJsonObject root;
+    save(root);
+
+    QJsonDocument doc(root);
+    file.write(doc.toJson());
+
+    return true;
+}
+
+void Sector::save(QJsonObject &json) const
 {
     Block::save(json);
 

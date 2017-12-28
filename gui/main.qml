@@ -139,7 +139,7 @@ ApplicationWindow {
         }
     }
 
-    DropArea {
+    /*DropArea {
         anchors.fill: parent
         onEntered: {
             if (drag.hasUrls){
@@ -152,5 +152,5 @@ ApplicationWindow {
                 currentFile.openFile(drop.urls)
             }
         }
-    }
+    }*/
 }

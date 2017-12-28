@@ -14,7 +14,7 @@ Window {
 
     property bool _editMode: false
 
-    property var structure: currentFile.document.structure
+    property var structure: currentFile.structure
 
     ColumnLayout {
         anchors.fill: parent
@@ -79,15 +79,14 @@ Window {
             onAccepted: {
                 if (!validate() || !typeEditor.item.validate()) return;
 
-                var ind = tree.selection.currentIndex
                 var typeId = cbType.currentIndex
                 var attr = typeEditor.item.attrs()
                 attr['name'] = teName.text.trim()
 
                 if (_editMode)
-                    structure.editBlock(ind, typeId, attr)
+                    changeBlock(typeId, attr)
                 else
-                    structure.addBlock(ind, typeId, attr)
+                    addBlock(typeId, attr)
                 dialog.close()
             }
             onRejected: dialog.close()

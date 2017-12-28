@@ -6,7 +6,7 @@ import QtQuick.Controls.Material 2.2
 Flickable {
     id: tree
     property alias model: rootRepeater.model
-    property var selectedRow
+    property var selectedNode
 
     property int rowHeight: 24
     property int rowSpacing: 0
@@ -17,6 +17,9 @@ Flickable {
     ScrollBar.vertical: ScrollBar { }
     contentHeight: contentColumn.height
 
+    signal treeChanged
+    signal doubleClicked
+
     boundsBehavior: Flickable.StopAtBounds
 
     function expandAll() {
@@ -24,7 +27,7 @@ Flickable {
             rootRepeater.itemAt(i).expand()
     }
 
-    Component.onCompleted: expandAll()
+    //Component.onCompleted: expandAll()
 
     Rectangle {
         id: dropPlacer
@@ -35,12 +38,16 @@ Flickable {
         visible: false
 
         property var target: null
-        function bind(item, toUp)
+        function bind(item, target)
         {
-            var p = tree.mapFromItem(item, 0, toUp ? 0 : item.height)
+            var tx = 0, ty = 0
+            if (target === 1) { tx = 32; ty = item.height }
+            else if (target === 2) ty = item.height
+
+            var p = tree.mapFromItem(item, tx, ty)
             x = p.x
             y = p.y
-            width = item.width
+            width = item.width - tx
         }
 
         Rectangle {
@@ -126,20 +133,20 @@ Flickable {
             onRowExpandedChanged: if (!expanderLoader.item) expanderLoader.sourceComponent = expanderComponent
 
             function expand() {
-                if (!node.children || !node.children.hasChilds) return;
+                if (node.rowCount() === 0) return;
 
                 rowExpanded = true
             }
 
             function expandAll() {
-                if (!node.children || !node.children.hasChilds) return;
+                if (node.rowCount() === 0) return;
 
                 rowExpanded = true
                 expanderLoader.item.expandAll()
             }
 
             function toggle() {
-                if (!node.children || !node.children.hasChilds) return;
+                if (node.rowCount() === 0) return;
 
                 rowExpanded = !rowExpanded
             }
@@ -151,6 +158,7 @@ Flickable {
                 id: rowMouse
                 height: rowHeight
                 width: parent.width
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
 
                 property bool held: false
 
@@ -167,7 +175,13 @@ Flickable {
                     drag.target.Drag.drop()
                     held = false
                 }
-                onDoubleClicked: toggle()
+                onDoubleClicked: {
+                    if (node.rowCount() === 0) {
+                        tree.doubleClicked()
+                        return
+                    }
+                    toggle()
+                }
 
                 DropArea {
                     id: dropArea
@@ -175,27 +189,47 @@ Flickable {
                     onDropped: {
                         dropPlacer.visible = false
 
-                        var source = drop.source.node
+                        var source = drop.source.node // Кого перетаскиваем
                         if (source === node) return
-                        //console.log('moving', source.text, isUp ? 'before' : 'after', node.text)
 
-                        if (isUp)
+                        if (dropTarget == 0)
                             source.moveBefore(node)
+                        else if (dropTarget == 1)
+                            node.append(source)
                         else
                             source.moveAfter(node)
+                        treeChanged();
                     }
 
-                    property bool isUp: drag.y < height / 2
-                    onIsUpChanged: if (containsDrag) dropPlacer.bind(rowItem, isUp)
-                    onContainsDragChanged: if (containsDrag) dropPlacer.bind(rowItem, isUp)
+                    property real upRange
+                    property real bottomRange
+                    onEntered: {
+                        var source = drag.source.node // Кого перетаскиваем
+                        if (node.canAppend(source)){
+                            upRange = height / 3
+                            bottomRange = 2 * height / 3
+                        } else {
+                            upRange = height / 2
+                            bottomRange = height / 2
+                        }
+                    }
+
+                    property int dropTarget: containsDrag ? ((drag.y < upRange) ? 0 : ((drag.y >= bottomRange) ? 2 : 1)) : -1
+                    onDropTargetChanged: {
+                        if (!containsDrag) return
+                        var source = drag.source.node // Кого перетаскиваем
+                        dropPlacer.bind(rowItem, dropTarget)
+                    }
+
+                    onContainsDragChanged: if (containsDrag) dropPlacer.bind(rowItem, dropTarget)
                 }
 
                 function select() {
-                    selectedRow = rowMouse
+                    selectedNode = node
                 }
 
                 Rectangle { // Background
-                    color: selectedRow === rowMouse ? Qt.rgba(0, 0, 0, 0.1) : 'transparent'
+                    color: selectedNode === node ? Qt.rgba(0, 0, 0, 0.1) : 'transparent'
                     anchors.fill: parent
                 }
 
@@ -210,8 +244,7 @@ Flickable {
                         width: iconSize; height: iconSize
 
                         Image {
-                            visible: node.children && node.children.hasChilds
-
+                            visible: node.count > 0
                             sourceSize: Qt.size(iconSize, iconSize)
                             source: 'qrc:icons/ic_arrow_drop_down_black_24px.svg'
                             opacity: 0.54
@@ -273,7 +306,7 @@ Flickable {
 
                 readonly property bool expanded: rowExpanded
                 readonly property int nextLevel: rowLevel + 1
-                readonly property var subNodeChildren: node.children
+                readonly property var subNode: node
             }
         }
     }
@@ -303,7 +336,7 @@ Flickable {
 
                 Repeater {
                     id: expanderRepeater
-                    model: subNodeChildren
+                    model: subNode
                     delegate: rowComponent
                 }
             }

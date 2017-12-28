@@ -10,7 +10,6 @@
 #include "interpretermodel.h"
 #include "base_interpreters.h"
 #include "qmlglobal.h"
-#include "treemodel.h"
 
 int main(int argc, char *argv[])
 {

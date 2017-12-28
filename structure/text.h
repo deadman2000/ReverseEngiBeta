@@ -19,7 +19,7 @@ public:
 protected:
     bool updateData() override;
     virtual void readAttr(const QJsonObject &json) override;
-    virtual void writeAttr(QJsonObject &json) override;
+    virtual void writeAttr(QJsonObject &json) const override;
 
 private:
     QByteArray _terminator;

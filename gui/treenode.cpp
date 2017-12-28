@@ -1,17 +1,13 @@
 #include "treenode.h"
 
-#include "treemodel.h"
-
-TreeNode::TreeNode(TreeModel *parent)
-    : QObject(parent)
-    , _model(parent)
-    , _children(nullptr)
+TreeNode::TreeNode(TreeNode *parent)
+    : QAbstractListModel(parent)
 {
 }
 
 TreeNode::~TreeNode()
 {
-    qDebug() << "Delete" << _text;
+    qDeleteAll(_nodes);
 }
 
 QString TreeNode::text() const
@@ -36,52 +32,120 @@ void TreeNode::setIcon(const QString &icon)
     emit iconChanged(icon);
 }
 
-TreeModel *TreeNode::children() const
+TreeNode *TreeNode::parentNode() const
 {
-    return _children;
+    return (TreeNode*)QObject::parent();
 }
 
-void TreeNode::appendNode(TreeNode *obj)
+// Childs
+
+QHash<int, QByteArray> TreeNode::roleNames() const
 {
-    if (!_children) {
-        _children = new TreeModel(this);
+    QHash<int, QByteArray> roles;
+    roles[NodeRole] = "node";
+    return roles;
+}
+
+int TreeNode::count() const
+{
+    return _nodes.count();
+}
+
+int TreeNode::rowCount(const QModelIndex &) const
+{
+    return _nodes.count();
+}
+
+QVariant TreeNode::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid())
+        return QVariant();
+
+    if (index.row() >= _nodes.count() || index.row() < 0)
+        return QVariant();
+
+    TreeNode * obj = _nodes.at(index.row());
+    switch (role)
+    {
+    case NodeRole:
+        return QVariant::fromValue(obj);
     }
-    _children->appendNode(obj);
-    emit childrenChanged(_children);
+
+    return QVariant();
 }
 
-TreeNode *TreeNode::createChild()
+int TreeNode::indexOf(TreeNode *node) const
 {
-    if (!_children) {
-        _children = new TreeModel(this);
-    }
-    return _children->createNode();
+    return _nodes.indexOf(node);
 }
 
-TreeModel *TreeNode::model() const
+void TreeNode::update()
 {
-    return _model;
+    foreach (TreeNode * n, _nodes)
+        n->update();
 }
 
-void TreeNode::setModel(TreeModel *model)
+void TreeNode::append(TreeNode *node)
 {
-    Q_ASSERT(model);
-    setParent(model);
-    _model = model;
+    Q_ASSERT(node);
+    if (node->parentNode())
+        node->remove();
+
+    node->setParent(this);
+    beginInsertRows(QModelIndex(), _nodes.count(), _nodes.count());
+    _nodes.append(node);
+    endInsertRows();
+
+    emit countChanged(_nodes.count());
+}
+
+void TreeNode::insert(int index, TreeNode *node)
+{
+    Q_ASSERT(node);
+    Q_ASSERT(index >= 0);
+    node->setParent(this);
+    beginInsertRows(QModelIndex(), index, index);
+    _nodes.insert(index, node);
+    endInsertRows();
+
+    emit countChanged(_nodes.count());
+}
+
+void TreeNode::remove()
+{
+    parentNode()->removeChild(this);
+}
+
+void TreeNode::removeChild(TreeNode *node)
+{
+    Q_ASSERT(node);
+    node->setParent(nullptr);
+    int i = _nodes.indexOf(node);
+    Q_ASSERT(i >= 0);
+    beginRemoveRows(QModelIndex(), i, i);
+    _nodes.removeAt(i);
+    endRemoveRows();
+
+    emit countChanged(_nodes.count());
 }
 
 void TreeNode::moveBefore(TreeNode *target)
 {
     Q_ASSERT(target);
-    _model->remove(this);
-    int i = target->model()->indexOf(target);
-    target->model()->insert(i, this);
+    remove();
+    int i = target->parentNode()->indexOf(target);
+    target->parentNode()->insert(i, this);
 }
 
 void TreeNode::moveAfter(TreeNode *target)
 {
     Q_ASSERT(target);
-    _model->remove(this);
-    int i = target->model()->indexOf(target);
-    target->model()->insert(i + 1, this);
+    remove();
+    int i = target->parentNode()->indexOf(target);
+    target->parentNode()->insert(i + 1, this);
+}
+
+bool TreeNode::canAppend(TreeNode *) const
+{
+    return true;
 }

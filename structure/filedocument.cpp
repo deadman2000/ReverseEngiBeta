@@ -6,21 +6,24 @@ FileDocument::FileDocument(QObject *parent)
     : QObject(parent)
 {
     _data = new FileModel(this);
-    _structureModel = new StructureModel(this, _data);
-    connect(_structureModel, &StructureModel::sectionsChanged, this, &FileDocument::sectionsChanged);
+    //_structureModel = new StructureModel(this, _data);
+    //connect(_structureModel, &StructureModel::sectionsChanged, this, &FileDocument::sectionsChanged);
+
+    _structure.setDataSource(_data);
+    _structure.setOffset(0);
 }
 
 FileDocument::~FileDocument()
 {
     _data->deleteLater();
-    _structureModel->deleteLater();
+    //_structureModel->deleteLater();
 }
 
 void FileDocument::openFile(const QString &path)
 {
     _fileName = path;
     _data->openFile(path);
-    _structureModel->loadStructure("../ReverseEngiBeta/win_exe.json");
+    loadStructure("../../ReverseEngiBeta/win_exe.json");
 }
 
 const QString & FileDocument::fileName() const
@@ -46,7 +49,17 @@ void FileDocument::addSection(int begin, int end)
     connect(section, &AddressRange::changed, this, &FileDocument::sectionsChanged);
 }
 
-QStandardItemModel* FileDocument::structure() const
+void FileDocument::loadStructure(const QUrl &url)
 {
-    return _structureModel;
+    loadStructure(url.toLocalFile());
+}
+
+void FileDocument::loadStructure(const QString &path)
+{
+    _structure.load(path);
+}
+
+Sector* FileDocument::structure()
+{
+    return &_structure;
 }

@@ -46,9 +46,9 @@ public:
 
     virtual QString toString() const = 0;
 
-    void acceptJSON(const QJsonObject & json); // Применяет атрибуты и структу из JSON
-    void toJSON(QJsonObject & json);           // Сохраняет атрибуты блока в JSON
-    virtual void save(QJsonObject &json);              // Сохраняет полную структуру блока в JSON
+    void acceptJSON(const QJsonObject & json);   // Применяет атрибуты и структу из JSON
+    void toJSON(QJsonObject & json) const;       // Сохраняет атрибуты блока в JSON
+    virtual void save(QJsonObject &json) const;  // Сохраняет полную структуру блока в JSON
 
     void remove();
 
@@ -57,7 +57,7 @@ public:
 protected:
     virtual bool updateData() = 0;
     virtual void readAttr(const QJsonObject & json);         // Сохраняет доп. атрибуты блока в JSON
-    virtual void writeAttr(QJsonObject & json);         // Сохраняет доп. атрибуты блока в JSON
+    virtual void writeAttr(QJsonObject & json) const;        // Сохраняет доп. атрибуты блока в JSON
 };
 
 #endif // BLOCK_H

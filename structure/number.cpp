@@ -120,7 +120,7 @@ void Number::readAttr(const QJsonObject &json)
     setSize(json["size"].toInt());
 }
 
-void Number::writeAttr(QJsonObject &json)
+void Number::writeAttr(QJsonObject &json) const
 {
     json["bigendian"] = _order_big_endian;
     json["signed"] = _signed;

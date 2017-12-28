@@ -15,8 +15,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp \
     qmlglobal.cpp \
     interpretermodel.cpp \
-    treemodel.cpp \
-    treenode.cpp
+    treenode.cpp \
+    structurenode.cpp
 
 RESOURCES += qml.qrc
 
@@ -35,7 +35,7 @@ LIBS += -lstructure
 HEADERS += \
     qmlglobal.h \
     interpretermodel.h \
-    treemodel.h \
-    treenode.h
+    treenode.h \
+    structurenode.h
 
 PRECOMPILED_HEADER += stdafx.h

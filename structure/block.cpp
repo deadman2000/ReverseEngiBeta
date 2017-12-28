@@ -84,18 +84,18 @@ void Block::readAttr(const QJsonObject &)
 {
 }
 
-void Block::toJSON(QJsonObject &json)
+void Block::toJSON(QJsonObject &json) const
 {
     json["name"] = _name;
     json["type"] = typeID();
     writeAttr(json);
 }
 
-void Block::writeAttr(QJsonObject &)
+void Block::writeAttr(QJsonObject &) const
 {
 }
 
-void Block::save(QJsonObject &json)
+void Block::save(QJsonObject &json) const
 {
     toJSON(json);
 }

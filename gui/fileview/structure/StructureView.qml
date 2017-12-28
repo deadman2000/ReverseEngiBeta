@@ -1,8 +1,8 @@
 import QtQuick 2.7
-import QtQuick.Controls 1.4 as C1
 import QtQuick.Controls 2.2
-import QtQml.Models 2.2
 import QtQuick.Controls.Material 2.2
+import QtQuick.Dialogs 1.2
+import QtQml.Models 2.2
 import "../../docking"
 import "../.."
 
@@ -11,10 +11,29 @@ DockPanel {
 
     buttons: [
         DockButton {
+            icon: 'qrc:icons/ic_folder_open_white_24px.svg'
+            onClicked: fileDialog.open()
+        },
+        DockButton {
+            icon: 'qrc:icons/ic_save_white_24px.svg'
+            //onClicked: saveStructure()
+        },
+        DockButton {
             icon: 'qrc:icons/ic_add_white_24px.svg'
             onClicked: createBlock()
         }
     ]
+
+    FileDialog {
+        id: fileDialog
+        title: "Please choose a file"
+        //folder: shortcuts.home
+        nameFilters: ["Structure files (*.json)"]
+        onAccepted: {
+            currentFile.document.loadStructure(fileUrl)
+            currentFile.structure = G.createStructure(currentFile.document);
+        }
+    }
 
     property var __editDialogComp: null
     function createEditDialog()
@@ -32,35 +51,49 @@ DockPanel {
     function editBlock()
     {
         var dialog = createEditDialog()
-        var obj = tree.model.getBlock(tree.selection.currentIndex)
-        dialog.fillForm(obj)
+        dialog.fillForm(tree.selectedNode.data())
         dialog.show()
+    }
+
+    function changeBlock(typeId, attrs)
+    {
+        if (tree.selectedNode)
+            tree.selectedNode.change(typeId, attrs)
+        updateView()
+    }
+
+    function addBlock(typeId, attrs)
+    {
+        if (tree.selectedNode)
+            tree.selectedNode.add(typeId, attrs)
+        else
+            currentFile.structure.add(typeId, attrs)
+        updateView()
     }
 
     function deleteBlock()
     {
-        tree.model.deleteBlock(tree.selection.currentIndex)
+        tree.selectedNode.remove()
+        updateView()
     }
 
-    C1.TreeView {
+    function updateView()
+    {
+        currentFile.structure.update()
+    }
+
+    CustomTree {
         id: tree
         anchors.fill: parent
-        model: currentFile.document.structure
-        style: CustomTreeStyle { }
-        //frameVisible: false
-
-        selection: ItemSelectionModel {
-            model: tree.model
-            onCurrentChanged: model.selectBlock(currentIndex)
-        }
+        model: currentFile.structure
+        onTreeChanged: updateView()
 
         MouseArea {
             anchors.fill: parent
             acceptedButtons: Qt.RightButton
+            propagateComposedEvents: true
             onPressed: {
-                var ind = tree.indexAt(mouse.x, mouse.y)
-                tree.selection.setCurrentIndex(ind, 0x10);
-
+                mouse.accepted = false
                 ctxMenu.x = mouse.x
                 ctxMenu.y = mouse.y
                 ctxMenu.open()
@@ -68,24 +101,6 @@ DockPanel {
         }
 
         onDoubleClicked: editBlock()
-
-        C1.TableViewColumn {
-            title: "Type"
-            role: "type"
-            width: 64
-        }
-
-        C1.TableViewColumn {
-            title: "Name"
-            role: "name"
-            width: 128
-        }
-
-        C1.TableViewColumn {
-            title: "Value"
-            role: "value"
-        }
-
     }
 
     Menu {

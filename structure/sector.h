@@ -18,11 +18,14 @@ public:
     virtual QString toString() const override;
 
     void append(Block * block);
+    void insert(int index, Block * block);
     void replace(int index, Block * block);
     void remove(Block * block);
     const QList<Block *> & childs() const;
 
-    virtual void save(QJsonObject &json) override;
+    bool load(const QString & fileName);
+    bool save(const QString & fileName) const;
+    virtual void save(QJsonObject &json) const override;
 
 protected:
     virtual bool updateData() override;

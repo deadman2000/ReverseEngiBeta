@@ -16,7 +16,7 @@ public:
 protected:
     virtual bool updateData() override;
     virtual void readAttr(const QJsonObject &json) override;
-    virtual void writeAttr(QJsonObject &json) override;
+    virtual void writeAttr(QJsonObject &json) const override;
 };
 
 #endif // BLOB_H

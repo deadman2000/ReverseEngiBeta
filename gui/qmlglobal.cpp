@@ -1,6 +1,7 @@
 #include "qmlglobal.h"
 
 #include <QFontMetrics>
+#include <QDir>
 
 #include "treenode.h"
 
@@ -8,24 +9,31 @@ QmlGlobal::QmlGlobal() : QObject(nullptr)
 {
     updateFontSize();
 
-    _tree = new TreeModel(this);
+    _tree = new TreeNode(nullptr);
 
     for (int i=0; i<5; i++)
     {
-       TreeNode * node = _tree->createNode();
+       TreeNode * node = new TreeNode();
        node->setText(QString("Node %1").arg(i));
        node->setIcon("qrc:icons/ic_folder_black_24px.svg");
+       _tree->append(node);
 
        if (i % 2 == 0)
        {
            for (int j=0; j<5; j++)
            {
-               TreeNode * subNode = node->createChild();
+               TreeNode * subNode = new TreeNode();
                subNode->setText(QString("Sub node %1").arg(j));
                subNode->setIcon("qrc:icons/ic_folder_black_24px.svg");
+               node->append(subNode);
            }
        }
     }
+}
+
+QObject *QmlGlobal::createStructure(FileDocument * file) const
+{
+    return new StructureNode(nullptr, file->structure());
 }
 
 void QmlGlobal::updateFontSize()

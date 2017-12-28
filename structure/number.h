@@ -23,7 +23,7 @@ public:
 protected:
     virtual bool updateData() override;
     void readAttr(const QJsonObject &json) override;
-    void writeAttr(QJsonObject &json) override;
+    void writeAttr(QJsonObject &json) const override;
 };
 
 #endif // NUMBER_H

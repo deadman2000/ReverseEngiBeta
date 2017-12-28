@@ -13,7 +13,7 @@ Rectangle {
 
     Image {
         id: image
-        sourceSize: Qt.size(24, 24)
+        sourceSize: Qt.size(16, 16)
         anchors.centerIn: parent
     }
 

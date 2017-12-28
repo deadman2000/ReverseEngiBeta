@@ -30,7 +30,7 @@ void Blob::readAttr(const QJsonObject &json)
     setSize(json["size"].toInt());
 }
 
-void Blob::writeAttr(QJsonObject &json)
+void Blob::writeAttr(QJsonObject &json) const
 {
     json["size"] = size();
 }
