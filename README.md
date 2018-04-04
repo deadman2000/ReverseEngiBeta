@@ -60,9 +60,4 @@ QJSValue three = myEngine.evaluate("1 + 2");
 - Генерация кода
 - Плагины-фильтры
 - Конвертор/экстрактор
-
-
-Аналоги:
-	OpenDDL (http://openddl.org/)
-	DFDL (https://en.wikipedia.org/wiki/Data_Format_Description_Language)
 	

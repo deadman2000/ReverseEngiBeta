@@ -30,7 +30,7 @@ class FormatParser:
             if tokval == 'struct':
                 b = DataBlock()
                 if self.current_element is not None:
-                    self.current_element.add_child(b)
+                    self.current_element.fields.append(b)
                 self.current_element = b
             elif tokval in TYPE_WORDS:
                 if self.current_type is None:
@@ -38,7 +38,7 @@ class FormatParser:
                 self.current_type += tokval
 
                 f = StructField(tokval, '')
-                self.current_element.add_child(f)
+                self.current_element.fields.append(f)
                 self.last_element = f
             else:
                 # Имя переменной
