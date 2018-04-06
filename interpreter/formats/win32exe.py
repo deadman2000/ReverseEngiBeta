@@ -3,6 +3,8 @@ import datetime
 
 
 # https://en.wikibooks.org/wiki/X86_Disassembly/Windows_Executable_Files
+# https://msdn.microsoft.com/ru-ru/library/windows/desktop/ms680547(v=vs.85).aspx
+# https://ru.wikipedia.org/wiki/Portable_Executable
 class DosHeader(DataBlock):
     fields = [
         StructField('signature', '2s'),
