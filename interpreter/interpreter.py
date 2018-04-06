@@ -1,22 +1,15 @@
 import ipaddress
 
-from formats.net import ethernetii
+from formats.net import EthernetFormat
 from winpcapy import WinPcapUtils
 
 
+eth = EthernetFormat()
 filter = ipaddress.IPv4Address('10.10.88.10')
 
 def packet_callback(win_pcap, param, header, pkt_data):
-    #try:
-    eth = ethernetii.parse_bytes(pkt_data)
-    if hasattr(eth, 'ip'):
-        if hasattr(eth.ip, 'tcp'):
-            print(eth.ip.tcp)
-    #except Exception as e:
-    #    print(e)
+    packet = eth.parse_bytes(pkt_data)
+    if hasattr(packet, 'ip') and hasattr(packet.ip, 'tcp') and len(packet.ip.tcp.data) > 0:
+        print('%s:%d -> %s:%d = %s' % (packet.ip.source, packet.ip.tcp.source_port, packet.ip.dest, packet.ip.tcp.dest_port, packet.ip.tcp.data.hex()))
 
 WinPcapUtils.capture_on("*", packet_callback)
-
-
-#from formats.win32exe import win32exe
-#print(win32exe.parse_file("d:/programs/miniroute.exe"))
