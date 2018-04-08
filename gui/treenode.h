@@ -15,7 +15,7 @@ class TreeNode : public QAbstractListModel
     };
 public:
     explicit TreeNode(TreeNode * parent = nullptr);
-    virtual ~TreeNode();
+    virtual ~TreeNode() override;
 
     QString text() const;
     void setText(const QString & text);

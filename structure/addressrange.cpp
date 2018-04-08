@@ -8,6 +8,7 @@ AddressRange::AddressRange(QObject *parent)
     , _style(nullptr)
     , _selectedStyle(nullptr)
     , _selected(false)
+    , _isBlock(false)
 {
     setStyle(new AreaStyle(this));
 
@@ -105,4 +106,14 @@ void AddressRange::unselect()
 {
     _selected = false;
     emit changed();
+}
+
+bool AddressRange::isBlock() const
+{
+    return _isBlock;
+}
+
+void AddressRange::setIsBlock(bool isBlock)
+{
+    _isBlock = isBlock;
 }

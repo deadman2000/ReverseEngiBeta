@@ -12,7 +12,7 @@ Flickable {
     property int rowSpacing: 0
     property int iconSize: 24
 
-    property bool _dragMode: false
+    property bool allowDrag: false
 
     ScrollBar.vertical: ScrollBar { }
     contentHeight: contentColumn.height
@@ -169,18 +169,18 @@ Flickable {
 
                 drag.onActiveChanged: dropPlacer.visible = drag.active
 
-                onPressAndHold: held = true
+                onPressAndHold: if (tree.allowDrag) held = true
                 onPressed: select()
                 onReleased: {
-                    drag.target.Drag.drop()
+                    if (drag.target)
+                        drag.target.Drag.drop()
                     held = false
                 }
                 onDoubleClicked: {
-                    if (node.rowCount() === 0) {
-                        tree.doubleClicked()
-                        return
+                    tree.doubleClicked()
+                    if (node.rowCount() > 0) {
+                        toggle()
                     }
-                    toggle()
                 }
 
                 DropArea {
@@ -238,9 +238,9 @@ Flickable {
                     height: rowHeight
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    anchors.leftMargin: rowLevel * 32
+                    anchors.leftMargin: rowLevel * iconSize
 
-                    Item {
+                    Image {
                         width: iconSize; height: iconSize
 
                         Image {
@@ -257,7 +257,7 @@ Flickable {
                         }
                     }
 
-                    Item {
+                    Image {
                         id: rowItem
                         Layout.fillWidth: true
                         height: parent.height

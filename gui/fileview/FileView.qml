@@ -87,6 +87,16 @@ DockPanel {
         fileModel.copyToClipboard(selection.begin, selection.end);
     }
 
+    property var _selectedRange: null
+
+    function selectRange(range)
+    {
+        if (_selectedRange)
+            _selectedRange.unselect()
+        range.select()
+        _selectedRange = range
+    }
+
     property int pressAddress: -1
 
     MouseArea {

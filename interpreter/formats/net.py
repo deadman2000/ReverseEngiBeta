@@ -47,9 +47,10 @@ class IPDataField(Element):
             obj['other'] = data
 
 
-class IPAddr(Converter):
+class IPAddr(StructField):
     def __init__(self, name):
-        super().__init__(StructField(name, 'I'), ipaddress.ip_address)
+        super().__init__(name, 'I')
+        self.convert(ipaddress.ip_address)
 
 
 class IPFormat(DataBlock):
@@ -87,21 +88,16 @@ class EthernetDataType(EEnum):
     IPv6 = 0x86DD
 
 
-class EthernetDataField(Element):
-    def __init__(self):
-        super().__init__()
-        self.ip = IPFormat()
+class EthernetDataField(DataBlock):
+    fields=[
+        IPFormat('ip').optional(lambda obj: obj.type == EthernetDataType.IPv4),
+        BytesField('other').optional(lambda obj: obj.type != EthernetDataType.IPv4),
+    ]
 
-    def read_value(self, stream, obj):
-        if obj.type == EthernetDataType.IPv4:
-            obj['ip'] = self.ip.parse_stream(stream)
-        else:
-            obj['other'] = stream.read()
-
-
-class MacAddressField(Converter):
+class MacAddressField(BytesField):
     def __init__(self, name):
-        super().__init__(BytesField(name, 6), lambda v: ':'.join([hex(b)[2:] for b in v]))
+        super().__init__(name, 6)
+        self.convert(lambda v: ':'.join([hex(b)[2:] for b in v]))
 
 
 class EthernetFormat(DataBlock):

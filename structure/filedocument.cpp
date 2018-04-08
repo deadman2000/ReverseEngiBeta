@@ -1,21 +1,17 @@
 #include "filedocument.h"
 
-#include "structure.h"
+#include "struct_reader.h"
 
 FileDocument::FileDocument(QObject *parent)
     : QObject(parent)
 {
     _data = new FileModel(this);
-    //_structureModel = new StructureModel(this, _data);
-    //connect(_structureModel, &StructureModel::sectionsChanged, this, &FileDocument::sectionsChanged);
-
-    _structure.setDataSource(_data);
-    _structure.setOffset(0);
 }
 
 FileDocument::~FileDocument()
 {
     _data->deleteLater();
+    delete _structure;
     //_structureModel->deleteLater();
 }
 
@@ -23,7 +19,7 @@ void FileDocument::openFile(const QString &path)
 {
     _fileName = path;
     _data->openFile(path);
-    loadStructure("../../ReverseEngiBeta/win_exe.json");
+    loadStructure();
 }
 
 const QString & FileDocument::fileName() const
@@ -49,17 +45,44 @@ void FileDocument::addSection(int begin, int end)
     connect(section, &AddressRange::changed, this, &FileDocument::sectionsChanged);
 }
 
-void FileDocument::loadStructure(const QUrl &url)
+void FileDocument::addBlockSections(Sector * sector)
 {
-    loadStructure(url.toLocalFile());
+    for (Block * b : sector->childs())
+    {
+        Sector * s = b->as_sector();
+        if (s) {
+            addBlockSections(s);
+        } else {
+            AddressRange * r = b->range();
+            r->setParent(this);
+            _sections.append(r);
+            connect(r, &AddressRange::changed, this, &FileDocument::sectionsChanged);
+        }
+    }
 }
 
-void FileDocument::loadStructure(const QString &path)
+void FileDocument::loadStructure()
 {
-    _structure.load(path);
+    for (int i=0; i<_sections.size(); i++)
+    {
+        if (_sections[i]->isBlock())
+        {
+            _sections.removeAt(i);
+            i--;
+        }
+    }
+
+    _structure = read_structure(_fileName);
+    if (_structure)
+    {
+        _structure->setDataSource(_data);
+        addBlockSections(_structure);
+    }
+
+    emit sectionsChanged();
 }
 
 Sector* FileDocument::structure()
 {
-    return &_structure;
+    return _structure;
 }

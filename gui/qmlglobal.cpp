@@ -33,7 +33,9 @@ QmlGlobal::QmlGlobal() : QObject(nullptr)
 
 QObject *QmlGlobal::createStructure(FileDocument * file) const
 {
-    return new StructureNode(nullptr, file->structure());
+    if (file->structure())
+        return new StructureNode(nullptr, file->structure());
+    return nullptr;
 }
 
 void QmlGlobal::updateFontSize()

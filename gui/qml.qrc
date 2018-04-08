@@ -25,12 +25,6 @@
         <file>style/ToolBar.qml</file>
         <file>style/Dialog.qml</file>
         <file>style/ComboBox.qml</file>
-        <file>fileview/structure/StructureView.qml</file>
-        <file>fileview/structure/EditBlockDialog.qml</file>
-        <file>fileview/structure/NumberEditor.qml</file>
-        <file>fileview/structure/TextEditor.qml</file>
-        <file>fileview/structure/BlobEditor.qml</file>
-        <file>fileview/structure/SectorEditor.qml</file>
         <file>fileview/interpreter/Interpreter.qml</file>
         <file>MainMenu.qml</file>
         <file>MainMenuItem.qml</file>
@@ -39,5 +33,6 @@
         <file>icons/ic_folder_black_24px.svg</file>
         <file>icons/ic_save_white_24px.svg</file>
         <file>icons/ic_folder_open_white_24px.svg</file>
+        <file>fileview/StructureView.qml</file>
     </qresource>
 </RCC>

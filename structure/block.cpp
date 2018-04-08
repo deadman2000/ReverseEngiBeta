@@ -1,18 +1,34 @@
 #include "block.h"
 
-#include "structure.h"
+#include "sector.h"
 
 Block::Block()
     : _dataSource(nullptr)
     , _parent(nullptr)
-    , _offset(-1)
-    , _isValid(false)
+    , _offset(0)
     , _size(0)
+    , _isValid(true)
+    , _range(nullptr)
 {
 }
 
 Block::~Block()
 {
+}
+
+QString Block::title() const
+{
+    return QString("<i>%1</i> %2: <b>%3</b>").arg(_typeName).arg(_name).arg(_valueStr);
+}
+
+const QString & Block::typeName() const
+{
+    return _typeName;
+}
+
+void Block::setTypeName(const QString &typeName)
+{
+    _typeName = typeName;
 }
 
 void Block::setDataSource(IDataSource *dataSource)
@@ -32,20 +48,12 @@ Sector *Block::parent() const
 
 void Block::setOffset(int offset)
 {
-    if (_offset != offset){
-        _offset = offset;
-        _isValid = updateData();
-    }
+    _offset = offset;
 }
 
 int Block::offset() const
 {
     return _offset;
-}
-
-int Block::endOffset() const
-{
-    return _offset + _size - 1;
 }
 
 int Block::size() const
@@ -56,12 +64,7 @@ int Block::size() const
 void Block::setSize(int value)
 {
     Q_ASSERT(value >= 0);
-
-    if (_size != value)
-    {
-        _size = value;
-        if (_parent) _parent->updateData();
-    }
+    _size = value;
 }
 
 bool Block::isValid() const
@@ -74,32 +77,6 @@ const QString &Block::name() const
     return _name;
 }
 
-void Block::acceptJSON(const QJsonObject &json)
-{
-    _name = json["name"].toString();
-    readAttr(json);
-}
-
-void Block::readAttr(const QJsonObject &)
-{
-}
-
-void Block::toJSON(QJsonObject &json) const
-{
-    json["name"] = _name;
-    json["type"] = typeID();
-    writeAttr(json);
-}
-
-void Block::writeAttr(QJsonObject &) const
-{
-}
-
-void Block::save(QJsonObject &json) const
-{
-    toJSON(json);
-}
-
 void Block::remove()
 {
     Q_ASSERT(_parent != nullptr);
@@ -107,16 +84,20 @@ void Block::remove()
     _parent->remove(this);
 }
 
-Block *Block::create(int typeId)
+Sector *Block::as_sector()
 {
-    switch (typeId)
-    {
-    case 0: return new Number();
-    case 1: return new Text();
-    case 2: return new Blob();
-    case 3: return new Sector();
-    default: throw new std::exception();
-    }
+    return dynamic_cast<Sector*>(this);
+}
+
+AddressRange *Block::range()
+{
+    if (_range) return _range;
+
+    AddressRange * range = new AddressRange(nullptr, _offset, _offset + _size - 1);
+    range->setIsBlock(true);
+    range->setStyle(new AreaStyle(QColor(0, 255, 0, 25), QColor(0, 255, 0), 2));
+
+    return _range = range;
 }
 
 void Block::setName(const QString &name)
@@ -127,4 +108,14 @@ void Block::setName(const QString &name)
 void Block::setDescription(const QString &description)
 {
     _description = description;
+}
+
+void Block::setValueStr(const QString &valueStr)
+{
+    _valueStr = valueStr;
+}
+
+QString Block::valueStr() const
+{
+    return _valueStr;
 }

@@ -2,6 +2,8 @@ QT += quick
 QT -= gui
 CONFIG += c++11
 
+INCLUDEPATH += $$PWD/../3rdparty/msgpack/
+
 TEMPLATE = lib
 
 # The following define makes your compiler emit warnings if you use
@@ -20,7 +22,6 @@ HEADERS += \
     areastyle.h \
     base_interpreters.h \
     basedatainterpreter.h \
-    blob.h \
     block.h \
     convert.h \
     filechunk.h \
@@ -28,29 +29,23 @@ HEADERS += \
     filedocument.h \
     filemodel.h \
     idatasource.h \
-    number.h \
     sector.h \
-    structure.h \
-    structuremodel.h \
-    text.h \
     iengine.h \
-    engine.h
+    engine.h \
+    struct_reader.h
 
 SOURCES += \
     addressrange.cpp \
     areastyle.cpp \
     base_interpreters.cpp \
     basedatainterpreter.cpp \
-    blob.cpp \
     block.cpp \
     filechunk.cpp \
     filedata.cpp \
     filedocument.cpp \
     filemodel.cpp \
     idatasource.cpp \
-    number.cpp \
     sector.cpp \
-    structuremodel.cpp \
-    text.cpp \
     iengine.cpp \
-    engine.cpp
+    engine.cpp \
+    struct_reader.cpp

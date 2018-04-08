@@ -6,16 +6,16 @@
 
 #include "filemodel.h"
 #include "addressrange.h"
-#include "structure.h"
-#include "structuremodel.h"
+#include "sector.h"
 
 class FileDocument : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString fileName READ fileName CONSTANT)
     Q_PROPERTY(FileModel* data READ data CONSTANT)
-    Q_PROPERTY(QQmlListProperty<AddressRange> sections READ sections CONSTANT)
+    Q_PROPERTY(QQmlListProperty<AddressRange> sections READ sections NOTIFY sectionsChanged)
 
+    void addBlockSections(Sector * sector);
 public:
     FileDocument(QObject *parent = 0);
     ~FileDocument();
@@ -33,8 +33,7 @@ public slots:
 
     void addSection(int begin, int end);
 
-    void loadStructure(const QUrl & url);
-    void loadStructure(const QString & path);
+    void loadStructure();
 
 signals:
     void sectionsChanged();
@@ -44,7 +43,7 @@ private:
     FileModel * _data;
     QList<AddressRange*> _sections;
 
-    Sector _structure;
+    Sector * _structure;
 };
 
 #endif // FILEDOCUMENT_H

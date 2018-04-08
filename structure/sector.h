@@ -7,15 +7,13 @@ class Sector : public Block
 {
     friend class Block;
 public:
-    Sector();
     virtual ~Sector() override;
 
-    virtual int typeID() const override;
-    virtual QString typeName() const override;
+    virtual QString title() const override;
 
     virtual void setDataSource(IDataSource *dataSource) override;
 
-    virtual QString toString() const override;
+    virtual QString valueStr() const override;
 
     void append(Block * block);
     void insert(int index, Block * block);
@@ -23,14 +21,7 @@ public:
     void remove(Block * block);
     const QList<Block *> & childs() const;
 
-    bool load(const QString & fileName);
-    bool save(const QString & fileName) const;
-    virtual void save(QJsonObject &json) const override;
-
 protected:
-    virtual bool updateData() override;
-    virtual void readAttr(const QJsonObject &json) override;
-
     void makeChild(Block * block);
 
 private:

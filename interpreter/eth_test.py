@@ -1,0 +1,8 @@
+from formats.net import EthernetFormat
+
+ETHERNET_DATA = '0007b4004d015404a660dc5e08004500006c2dd34000800600000a0a4e0771939aee7dbc24f5415c87ede7cc36f45018010264f1000013426974546f7272656e742070726f746f636f6c00000000001800054fbdafe756fcb629ce19178de30a26af5b934ca62d7142343033302d4f72725a55767452446a4762'
+
+ethernet = EthernetFormat()
+data = bytes.fromhex(ETHERNET_DATA)
+result = ethernet.parse_bytes(data, to_meta=True)
+print(result)

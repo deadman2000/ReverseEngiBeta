@@ -29,14 +29,17 @@ public:
     AreaStyle * style() const;
     void setStyle(AreaStyle * style);
 
-    void select();
-    void unselect();
+    bool isBlock() const;
+    void setIsBlock(bool isBlock);
 
 signals:
     void changed();
 
 public slots:
     void reset();
+
+    void select();
+    void unselect();
 
 private:
     void updateIsSet();
@@ -45,6 +48,7 @@ private:
     int _begin;
     int _end;
     bool _isSet;
+    bool _isBlock;
 
     AreaStyle *_style, *_selectedStyle;
     bool _selected;

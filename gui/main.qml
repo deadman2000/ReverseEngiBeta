@@ -4,7 +4,6 @@ import QtQuick.Layouts 1.3
 import "docking"
 import "fileview"
 import "fileview/interpreter"
-import "fileview/structure"
 
 ApplicationWindow {
     id: window

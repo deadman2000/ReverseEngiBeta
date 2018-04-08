@@ -1,6 +1,10 @@
+import pprint
 import unittest
 from ipaddress import IPv4Address
 from formats.net import *
+
+
+ETHERNET_DATA = '0007b4004d015404a660dc5e08004500006c2dd34000800600000a0a4e0771939aee7dbc24f5415c87ede7cc36f45018010264f1000013426974546f7272656e742070726f746f636f6c00000000001800054fbdafe756fcb629ce19178de30a26af5b934ca62d7142343033302d4f72725a55767452446a4762'
 
 
 class TestStringMethods(unittest.TestCase):
@@ -32,9 +36,8 @@ class TestStringMethods(unittest.TestCase):
 
     def test_eth_ip_tcp(self):
         ethernet = EthernetFormat()
-        data = bytes.fromhex(
-            '0007b4004d015404a660dc5e08004500006c2dd34000800600000a0a4e0771939aee7dbc24f5415c87ede7cc36f45018010264f1000013426974546f7272656e742070726f746f636f6c00000000001800054fbdafe756fcb629ce19178de30a26af5b934ca62d7142343033302d4f72725a55767452446a4762')
-        result = ethernet.parse_bytes(data)
+        data = bytes.fromhex(ETHERNET_DATA)
+        result = ethernet.parse_bytes(data, to_meta=True)
         example = {
             'dest': '0:7:b4:0:4d:1',
             'ip': {'dest': IPv4Address('113.147.154.238'),
@@ -70,6 +73,7 @@ class TestStringMethods(unittest.TestCase):
             'source': '54:4:a6:60:dc:5e',
             'type': EthernetDataType.IPv4
         }
+        pprint.pprint(result)
         self.assertDictEqual(result, example)
 
 
