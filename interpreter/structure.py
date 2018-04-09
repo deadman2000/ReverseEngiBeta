@@ -60,6 +60,12 @@ def reorganize_meta(obj):
 
         if isinstance(val, AttrDict):
             val = reorganize_meta(val)
+        elif isinstance(val, list):
+            obj_list = []
+            list_meta = obj['$' + key + '[]']
+            for i in range(len(val)):
+                obj_list.append({'value': reorganize_meta(val[i]), **list_meta[i]})
+            val = obj_list
 
         m['value'] = val
 
@@ -274,17 +280,29 @@ class ArrayField(Element):
         super().__init__(name)
         self.count = count
         self.element = element
+        self.element.set_parent(self)
         pass
 
     def read_value(self, stream, obj):
         count = get_value(self.count, obj)
+        with_meta = self.is_write_meta()
+        if with_meta:
+            meta = []
         arr = []
         for _ in range(count):
+            if with_meta:
+                pos = stream.tell()
+
             if self.element.name is None:
                 e = self.element.read_stream(stream)
             else:
                 e = self.element.read_stream(stream, obj)
             arr.append(e)
+
+            if with_meta:
+                size = stream.tell() - pos
+                meta.append({'offset': pos, 'size': size})
+                obj['$' + self.name + '[]'] = meta # TODO Возможен вариант, когда элемент считывается не в obj
         return arr
 
 
