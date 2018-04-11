@@ -3,11 +3,28 @@
 #include "iengine.h"
 #include "convert.h"
 
+#define SIGNED   (true)
+#define UNSIGNED (false)
+
+#define BIG_ENDIAN (true)
+#define LITTLE_ENDIAN (false)
+
 class NumberInterpreter : public BaseDataInterpreter {
 public:
+    NumberInterpreter(unsigned char size,
+                      bool isSigned,
+                      bool byte_order_be,
+                      unsigned char base = 10)
+        : _size(size)
+        , _signed(isSigned)
+        , _byte_order_be(byte_order_be)
+        , _base(base)
+    {
+    }
+
     virtual QString name() const override
     {
-        return QString("%1%2 bytes").arg(_signed ? "±" : "+").arg(_size);
+        return QString("%1%2%3").arg(_byte_order_be ? "<" : ">").arg(_signed ? "" : "u").arg(getTypeName()); // _signed ? "±" : "+"
     }
 
     virtual QString toString(IDataSource * dataSource, int offset) const override
@@ -18,24 +35,36 @@ public:
         if (_signed)
         {
             if (_byte_order_be)
-                return QString::number(getValueBE<qulonglong>(data), _base);
-            else
-                return QString::number(getValueLE<qulonglong>(data), _base);
-        }
-        else
-        {
-            if (_byte_order_be)
                 return QString::number(getValueBE<qlonglong>(data), _base);
             else
                 return QString::number(getValueLE<qlonglong>(data), _base);
         }
+        else
+        {
+            if (_byte_order_be)
+                return QString::number(getValueBE<qulonglong>(data), _base);
+            else
+                return QString::number(getValueLE<qulonglong>(data), _base);
+        }
     }
 
-private:
-    unsigned char _size; // Количество байт
-    unsigned char _base; // Система счисления для перевода в строку
-    bool _signed;        // Знаковость. True - Знаковый
-    bool _byte_order_be; // Порядок байт. True - Big Endian
+protected:
+    virtual QString getTypeName() const
+    {
+        switch (_size)
+        {
+        case 1: return "byte";
+        case 2: return "short";
+        case 4: return "int";
+        case 8: return "long";
+        default: return QString("%1 bytes").arg(_size);
+        }
+    }
+
+    unsigned char _size;  // Количество байт
+    bool _signed;         // Знаковость. True - Знаковый
+    bool _byte_order_be;  // Порядок байт. True - Big Endian
+    unsigned char _base;  // Система счисления для перевода в строку
 };
 
 class SByteInterpreter : public BaseDataInterpreter {
@@ -151,6 +180,7 @@ public:
 
 void init_base_interpreters()
 {
+    engine().registerInterpreter(new NumberInterpreter(8, SIGNED, BIG_ENDIAN));
     engine().registerInterpreter(new SByteInterpreter);
     engine().registerInterpreter(new UByteInterpreter);
     engine().registerInterpreter(new StringZeroTermInterpreter);

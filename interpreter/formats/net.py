@@ -6,22 +6,22 @@ from structure import *
 class TCPFormat(DataBlock):
     byteorder = ByteOrder.LE
     fields = [
-        StructField('source_port', 'H'),
-        StructField('dest_port', 'H'),
-        StructField('sn', 'I'),
-        StructField('ack_sn', 'I'),
+        NumberField('source_port', 2),
+        NumberField('dest_port', 2),
+        NumberField('sn', 4),
+        NumberField('ack_sn', 4),
         BitParser(fields=[
             BitField('header_size', 4),
             BitField('res', 6),
             BitField('flags', 6)
         ]),
-        StructField('size', 'H'),
-        StructField('check_sum', 'H'),
-        StructField('priority', 'H'),
+        NumberField('size', 2),
+        NumberField('check_sum', 2),
+        NumberField('priority', 2),
         ArrayField(
             name='options',
             count=lambda p: p.header_size - 5,
-            element=StructField('options', 'I')),
+            element=NumberField(bytes_count=4)),
         BytesField(name='data')
     ]
 
@@ -47,9 +47,9 @@ class IPDataField(Element):
             obj['other'] = data
 
 
-class IPAddr(StructField):
+class IPAddr(NumberField):
     def __init__(self, name):
-        super().__init__(name, 'I')
+        super().__init__(name, 4)
         self.convert(ipaddress.ip_address)
 
 
@@ -62,21 +62,21 @@ class IPFormat(DataBlock):
             BitField('dscp', 6),
             BitField('ecn', 2),
         ]),
-        StructField('size', 'H'),
-        StructField('id', 'H'),
+        NumberField('size', 2),
+        NumberField('id', 2),
         BitParser(fields=[
             BitField('flags', 3),
             BitField('offset', 13),
         ]),
-        StructField('ttl', 'B'),
-        StructField('protocol', 'B').convert(IPProtocol.from_value),
-        StructField('sum', 'H'),
+        NumberField('ttl', 1),
+        NumberField('protocol', 1).convert(IPProtocol.from_value),
+        NumberField('sum', 2),
         IPAddr('source'),
         IPAddr('dest'),
         ArrayField(
             name='options',
             count=lambda p: p.header_size - 5,
-            element=StructField('options', 'I')),
+            element=NumberField(bytes_count=4)),
         IPDataField()
     ]
 
@@ -94,6 +94,7 @@ class EthernetDataField(DataBlock):
         BytesField('other').optional(lambda obj: obj.type != EthernetDataType.IPv4),
     ]
 
+
 class MacAddressField(BytesField):
     def __init__(self, name):
         super().__init__(name, 6)
@@ -105,7 +106,7 @@ class EthernetFormat(DataBlock):
     fields = [
         MacAddressField('dest'),
         MacAddressField('source'),
-        StructField('type', 'H').convert(EthernetDataType.from_value),
+        NumberField('type', 2).convert(EthernetDataType.from_value),
         EthernetDataField(),
         BytesField('padding')
     ]

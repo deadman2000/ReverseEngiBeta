@@ -9,7 +9,7 @@ T getValueBE(QByteArray & data)
     T val = 0;
     for (int i=0; i<data.size(); i++)
     {
-        val |= data[i] << (8 * i);
+        val |= ((uchar)data[i]) << (i << 3);
     }
     return val;
 }
@@ -18,9 +18,9 @@ template<typename T>
 T getValueLE(QByteArray & data)
 {
     T val = 0;
-    for (int i=0, n=data.size() - 1; n>=0; i++, n--)
+    for (int i=0; i<data.size(); i++)
     {
-        val |= data[i] << (8 * n);
+        val = (val << 8) | data[i];
     }
     return val;
 }

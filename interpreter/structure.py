@@ -1,7 +1,6 @@
 import io
 from ctypes import c_ushort, LittleEndianStructure, BigEndianStructure, sizeof
 from enum import Enum, IntEnum
-from struct import Struct
 
 
 class EEnum(IntEnum):
@@ -56,6 +55,7 @@ def reorganize_meta(obj):
 
         m = obj['$' + key]
         if m['size'] <= 0:
+            assert (m['size'] == 0)
             continue
 
         if isinstance(val, AttrDict):
@@ -70,6 +70,42 @@ def reorganize_meta(obj):
         m['value'] = val
 
         result[key] = m
+
+    return result
+
+
+def reorganize_meta_compact(obj):
+    result = {}
+    for key, val in obj.items():
+        if key.startswith('$'):
+            continue
+
+        m = obj['$' + key]
+        if m['size'] <= 0:
+            assert (m['size'] == 0)
+            continue
+
+        if isinstance(val, AttrDict):
+            val = reorganize_meta_compact(val)
+        elif isinstance(val, list):
+            obj_list = {}
+            list_meta = obj['$' + key + '[]']
+            for i in range(len(val)):
+                lm = list_meta[i]
+                obj_list[i] = [
+                    lm['offset'],
+                    lm['size'],
+                    0,
+                    reorganize_meta_compact(val[i])
+                ]
+            val = obj_list
+
+        result[key] = [
+            m['offset'],
+            m['size'],
+            0,
+            val
+        ]
 
     return result
 
@@ -127,10 +163,12 @@ class Element(object):
 
         return obj
 
-    def parse_stream(self, stream, to_meta=False):
+    def parse_stream(self, stream, to_meta=False, compact_meta=False):
         self.with_meta = to_meta
         obj = self.read_stream(StreamWrapper(stream), None)
         if to_meta:
+            if compact_meta:
+                return reorganize_meta_compact(obj)
             return reorganize_meta(obj)
         return obj
 
@@ -182,36 +220,37 @@ class Element(object):
         return self.with_meta
 
 
-class StructField(Element):
-    def __init__(self, name=None, fmt=None):
-        """
-        :type fmt: str
-        """
+class NumberField(Element):
+    bytes_count = 0
+    signed = False
+
+    def __init__(self, name=None, bytes_count=0, signed=None):
         super().__init__(name)
-        self.fmt = fmt
-        self.struct = None
+        if bytes_count:
+            self.bytes_count = bytes_count
+        if signed is not None:
+            self.signed = signed
 
     def read_value(self, stream, obj):
-        if not self.struct:
-            self.init_struct()
+        if self.bytes_count == 0:
+            return None
 
-        data = stream.read(self.struct.size)
-        if len(data) < self.struct.size:
+        data = stream.read(self.bytes_count)
+        if len(data) < self.bytes_count:
             raise Exception("Unexcepted end of data")
-        unpacked = self.struct.unpack(data)
-        return unpacked[0] if len(unpacked) == 1 else unpacked
 
-    def init_struct(self):
-        fmt = self.fmt
-        if not fmt.startswith('>') and not fmt.startswith('<'):
-            if self.is_bigendian():
-                fmt = '<' + fmt
-            else:
-                fmt = '>' + fmt
-        self.struct = Struct(fmt)
+        val = 0
+        if self.is_bigendian():  # TODO Signed support
+            for i in range(len(data)):
+                val |= data[i] << (i << 3)
+        else:
+            for b in data:
+                val = b | (val << 8)
+
+        return val
 
     def write_metainfo(self, meta, obj):
-        meta['format'] = self.fmt
+        meta['type'] = self.bytes_count
 
 
 class ObjectElement(Element):
@@ -248,13 +287,13 @@ class BitParser(ObjectElement):
             self.fields = fields
         self.bitorder = bitorder
         self.struct = None
-        self.size = None
+        self.bytes_count = None
 
     def read_fields(self, stream, obj):
         if not self.struct:
             self.init_struct()
 
-        data = stream.read(self.size)
+        data = stream.read(self.bytes_count)
         s = self.struct.from_buffer_copy(data)
         for f in self.fields:
             v = s.__getattribute__(f.name)
@@ -272,7 +311,7 @@ class BitParser(ObjectElement):
             _fields_ = sf
 
         self.struct = BitStruct
-        self.size = sizeof(BitStruct)
+        self.bytes_count = sizeof(BitStruct)
 
 
 class ArrayField(Element):
@@ -281,7 +320,7 @@ class ArrayField(Element):
         self.count = count
         self.element = element
         self.element.set_parent(self)
-        pass
+        assert(self.element.name is None)
 
     def read_value(self, stream, obj):
         count = get_value(self.count, obj)
@@ -293,28 +332,35 @@ class ArrayField(Element):
             if with_meta:
                 pos = stream.tell()
 
-            if self.element.name is None:
-                e = self.element.read_stream(stream)
-            else:
-                e = self.element.read_stream(stream, obj)
+            e = self.element.read_stream(stream)
             arr.append(e)
 
             if with_meta:
                 size = stream.tell() - pos
                 meta.append({'offset': pos, 'size': size})
-                obj['$' + self.name + '[]'] = meta # TODO Возможен вариант, когда элемент считывается не в obj
+                obj['$' + self.name + '[]'] = meta
         return arr
 
 
 class BytesField(Element):
-    def __init__(self, name=None, size=None):
+    def __init__(self, name=None, count=None):
         super().__init__(name)
-        self.size = size
+        self.count = count
 
     def read_value(self, stream, obj):
-        if self.size:
-            return stream.read(get_value(self.size, obj))
+        if self.count:
+            return stream.read(get_value(self.count, obj))
         return stream.read()
+
+
+class StringField(BytesField):
+    encoding = None
+
+    def read_value(self, stream, obj):
+        val = super().read_value(stream, obj)
+        if not self.encoding:
+            return val.decode()
+        return val.decode(self.encoding)
 
 
 class DataBlock(ObjectElement):

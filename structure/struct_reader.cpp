@@ -14,9 +14,6 @@ QString to_string(const msgpack::object & obj)
 {
     switch (obj.type)
     {
-    case type::ARRAY:
-        return "[]";
-
     case type::NEGATIVE_INTEGER:
     case type::POSITIVE_INTEGER:
         return QString::number(obj.as<long long>());
@@ -27,10 +24,6 @@ QString to_string(const msgpack::object & obj)
     case type::BIN:
         return QString::fromStdString(obj.as<std::string>());
 
-    case type::MAP:
-        //auto map = obj.as<std::multimap>();
-        return "map";
-
     default:
         qWarning() << "Type" << obj.type << "not implemented";
         return "";
@@ -38,10 +31,11 @@ QString to_string(const msgpack::object & obj)
 }
 
 Block * parse_block(const msgpack::object_kv & kv);
-Block * parse_block(QString & name, const msgpack::object_map & map);
+Block * parse_block(QString & name, const msgpack::object_array & arr);
 
 Sector * parse_struct(const msgpack::object_map & map)
 {
+    //qDebug() << "Parse struct";
     Sector * sector = new Sector();
 
     for (auto const& kv : map) {
@@ -52,72 +46,44 @@ Sector * parse_struct(const msgpack::object_map & map)
     return sector;
 }
 
-
-Sector * parse_array(const QString & parent_name, const msgpack::object_array & array)
-{
-    Sector * sector = new Sector();
-    int i = 0;
-    for (auto const& obj : array) {
-        QString name = QString("%1[%2]").arg(parent_name).arg(i);
-        Block * block = parse_block(name, obj.via.map);
-        sector->append(block);
-        ++i;
-    }
-    return sector;
-}
-
 Block * parse_block(const msgpack::object_kv & kv)
 {
-    QString name = QString::fromStdString(kv.key.as<std::string>());
+    QString name = to_string(kv.key);
+    //qDebug() << "Parse block " << name;
 
-    if (kv.val.type != type::MAP)
+    if (kv.val.type != type::ARRAY)
         qWarning() << name;
-    Q_ASSERT(kv.val.type == type::MAP);
-
-    return parse_block(name, kv.val.via.map);
+    Q_ASSERT(kv.val.type == type::ARRAY);
+    return parse_block(name, kv.val.via.array);
 }
 
-Block * parse_block(QString & name, const msgpack::object_map & map)
+Block * parse_block(QString & name, const msgpack::object_array & arr)
 {
+    //qDebug() << "Parse block array" << name;
     Block * block = nullptr;
 
-    int offset = 0;
-    int size = 0;
+    int offset = arr.ptr[0].as<int>();
+    //qDebug() << "   Offset:" << offset;
+    int size = arr.ptr[1].as<int>();
+    //qDebug() << "   Size:" << size;
+    int t = arr.ptr[2].as<int>();
+    //qDebug() << "   Type:" << t;
 
-    for (auto const& val_kv : map) {
-        auto key = val_kv.key.as<std::string>();
-        auto & val = val_kv.val;
-
-        if (key == "offset") {
-            offset = val.as<int>();
-        } else if (key == "size") {
-            size = val.as<int>();
-        } else if (key == "value") {
-            switch (val.type)
-            {
-            case type::MAP:
-                block = parse_struct(val.via.map);
-                break;
-            case type::ARRAY:
-                if (val.via.array.size > 0 && val.via.array.ptr[0].type == type::MAP)
-                    block = parse_array(name, val.via.array);
-                else {
-                    block = new Block();
-                    QString valStr = to_string(val);
-                    block->setValueStr(valStr);
-                }
-                break;
-            default:
-                block = new Block();
-                QString valStr = to_string(val);
-                block->setValueStr(valStr);
-                break;
-            }
-        } else if (key == "format") {
-            // TODO parse format
-        } else {
-            qDebug() << QString::fromStdString(key);
-        }
+    auto & val = arr.ptr[3];
+    //qDebug() << "   Val:" << val.type;
+    switch (val.type)
+    {
+    case type::MAP:
+        block = parse_struct(val.via.map);
+        break;
+    case type::ARRAY:
+        qWarning() << "Array not support" << name;
+        break;
+    default:
+        block = new Block();
+        QString valStr = to_string(val);
+        block->setValueStr(valStr);
+        break;
     }
 
     Q_ASSERT(block);
@@ -155,6 +121,7 @@ Sector *read_structure(QString &filePath)
     msgpack::object_handle oh = msgpack::unpack(out.data(), out.size());
     msgpack::object o = oh.get();
 
+    Q_ASSERT(o.type == type::MAP);
     Sector * root = parse_struct(o.via.map);
     return root;
 }

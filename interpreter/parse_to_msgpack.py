@@ -18,7 +18,7 @@ def main():
     args = vars(parser.parse_args())
 
     fmt = ExeFormat()
-    obj = fmt.parse_file(args['in'], to_meta=True)
+    obj = fmt.parse_file(args['in'], to_meta=True, compact_meta=True)
     # http://sugendran.github.io/msgpack-visualizer/
     data = msgpack.packb(obj, default=encode_datetime, use_bin_type=True)
     sys.stdout.buffer.write(data)

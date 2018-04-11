@@ -25,11 +25,11 @@ class TestStringMethods(unittest.TestCase):
 
     def test_optional(self):
         block = DataBlock(fields=[
-            StructField('a', 'B').optional(True),
-            StructField('b', 'B').optional(False),
-            StructField('c', 'B'),
-            StructField('d', 'B').optional(lambda o: o.c == 2),
-            StructField('e', 'B').optional(lambda o: o.c == 48)
+            NumberField('a', 1).optional(True),
+            NumberField('b', 1).optional(False),
+            NumberField('c', 1),
+            NumberField('d', 1).optional(lambda o: o.c == 2),
+            NumberField('e', 1).optional(lambda o: o.c == 48)
         ])
         obj = block.parse_bytes(b'\x01\x02\x03')
         self.assertDictEqual(obj, {'a': 1, 'c': 2, 'd': 3})
@@ -37,7 +37,7 @@ class TestStringMethods(unittest.TestCase):
     def test_eth_ip_tcp(self):
         ethernet = EthernetFormat()
         data = bytes.fromhex(ETHERNET_DATA)
-        result = ethernet.parse_bytes(data, to_meta=True)
+        result = ethernet.parse_bytes(data)
         example = {
             'dest': '0:7:b4:0:4d:1',
             'ip': {'dest': IPv4Address('113.147.154.238'),

@@ -1,5 +1,5 @@
 from enum import IntFlag
-from structure import DataBlock, StructField, ByteOrder, EEnum, ArrayField
+from structure import DataBlock, NumberField, ByteOrder, EEnum, ArrayField, BytesField, StringField
 import datetime
 
 
@@ -76,96 +76,96 @@ class Characteristic(IntFlag):
 
 class DosHeader(DataBlock):
     fields = [
-        StructField('signature', '2s'),
-        StructField('bytes_in_last_block', 'H'),
-        StructField('blocks_in_file', 'H'),
-        StructField('num_relocs', 'H'),
-        StructField('header_paragraphs', 'H'),
-        StructField('min_extra_paragraphs', 'H').convert(hex_2),
-        StructField('max_extra_paragraphs', 'H').convert(hex_2),
-        StructField('ss', 'H').convert(hex_2),
-        StructField('sp', 'H').convert(hex_2),
-        StructField('checksum', 'H'),
-        StructField('ip', 'H'),
-        StructField('cs', 'H'),
-        StructField('reloc_table_offset', 'H'),
-        StructField('overlay_number', 'H'),
+        StringField('signature', 2),
+        NumberField('bytes_in_last_block', 2),
+        NumberField('blocks_in_file', 2),
+        NumberField('num_relocs', 2),
+        NumberField('header_paragraphs', 2),
+        NumberField('min_extra_paragraphs', 2).convert(hex_2),
+        NumberField('max_extra_paragraphs', 2).convert(hex_2),
+        NumberField('ss', 2).convert(hex_2),
+        NumberField('sp', 2).convert(hex_2),
+        NumberField('checksum', 2),
+        NumberField('ip', 2),
+        NumberField('cs', 2),
+        NumberField('reloc_table_offset', 2),
+        NumberField('overlay_number', 2),
     ]
 
 
 class ExeReloc(DataBlock):
     fields = [
-        StructField('offset', 'H').convert(hex_2),
-        StructField('segment', 'H').convert(hex_2),
+        NumberField('offset', 2).convert(hex_2),
+        NumberField('segment', 2).convert(hex_2),
     ]
 
 
 class DosExtHeader(DataBlock):
     fields = [
-        StructField('reserved1', '4H'),
-        StructField('oem_id', 'H'),
-        StructField('oem_info', 'H'),
-        StructField('reserved2', '10H'),
-        StructField('e_lfanew', 'I'),
+        BytesField('reserved1', 8),
+        NumberField('oem_id', 2),
+        NumberField('oem_info', 2),
+        BytesField('reserved2', 20),
+        NumberField('e_lfanew', 4),
     ]
 
 
 class COFFHeader(DataBlock):
     fields = [
-        StructField('signature', '4s'),  # Must be PE\0\0
-        StructField('machine', 'H').convert(MachineTypes.from_value),
-        StructField('sections', 'H'),
-        StructField('datetime', 'I').convert(datetime.datetime.fromtimestamp),
-        StructField('sym_tbl', 'I'),
-        StructField('sym_count', 'I'),
-        StructField('size_opt', 'H'),
-        StructField('characts', 'H').convert(Characteristic)
+        StringField('signature', 4),  # Must be PE\0\0
+        NumberField('machine', 2).convert(MachineTypes.from_value),
+        NumberField('sections', 2),
+        NumberField('datetime', 4).convert(datetime.datetime.fromtimestamp),
+        NumberField('sym_tbl', 4),
+        NumberField('sym_count', 4),
+        NumberField('size_opt', 2),
+        NumberField('characts', 2).convert(Characteristic)
     ]
 
 
 class PEOptHeader(DataBlock):
     fields = [
-        StructField('magic', 'H').convert(PeFormat.from_value),
-        StructField('major_linker_version', 'B'),
-        StructField('minor_linker_version', 'B'),
-        StructField('size_of_code', 'I'),
-        StructField('size_of_init_data', 'I'),
-        StructField('size_of_uninit_data', 'I'),
-        StructField('entry_point', 'I'),
-        StructField('base_of_code', 'I').convert(hex),
+        NumberField('magic', 2).convert(PeFormat.from_value),
+        NumberField('major_linker_version', 1),
+        NumberField('minor_linker_version', 1),
+        NumberField('size_of_code', 4),
+        NumberField('size_of_init_data', 4),
+        NumberField('size_of_uninit_data', 4),
+        NumberField('entry_point', 4),
+        NumberField('base_of_code', 4).convert(hex),
     ]
 
 
 class DataDirectory(DataBlock):
     fields = [
-        StructField('addr', 'I'),
-        StructField('size', 'I'),
+        NumberField('addr', 4),
+        NumberField('size', 4),
     ]
 
 
 class PE64ExtHeader(DataBlock):
     fields = [
-        StructField('image_base', 'Q').convert(hex),
-        StructField('section_alignment', 'I').convert(hex),
-        StructField('file_alignment', 'I').convert(hex),
-        StructField('major_os_ver', 'H'),
-        StructField('minor_os_ver', 'H'),
-        StructField('major_image_ver', 'H'),
-        StructField('minor_image_ver', 'H'),
-        StructField('major_subs_ver', 'H'),
-        StructField('minor_subs_ver', 'H'),
-        StructField('win32_version', 'I'),
-        StructField('image_size', 'I'),
-        StructField('headers_size', 'I'),
-        StructField('checksum', 'I'),
-        StructField('subsystem', 'H'),
-        StructField('dll_chars', 'H'),
-        StructField('stacke_reserve_size', 'Q'),
-        StructField('stacke_commit_size', 'Q'),
-        StructField('heap_reserve_size', 'Q'),
-        StructField('heap_commit_size', 'Q'),
-        StructField('loader_flags', 'I'),
-        StructField('rva_count', 'I'),
+        NumberField('image_base', 8).convert(hex),
+        NumberField('section_alignment', 4).convert(hex),
+        NumberField('file_alignment', 4).convert(hex),
+        NumberField('major_os_ver', 2),
+        NumberField('minor_os_ver', 2),
+        NumberField('major_image_ver', 2),
+        NumberField('minor_image_ver', 2),
+        NumberField('major_subs_ver', 2),
+        NumberField('minor_subs_ver', 2),
+        NumberField('win32_version', 4),
+        NumberField('image_size', 4),
+        NumberField('headers_size', 4),
+        NumberField('checksum', 4),
+        NumberField('subsystem', 2),
+        NumberField('dll_chars', 2),
+        NumberField('stacke_reserve_size', 8),
+        NumberField('stacke_commit_size', 8),
+        NumberField('heap_reserve_size', 8),
+        NumberField('heap_commit_size', 8),
+        NumberField('loader_flags', 4),
+        NumberField('rva_count', 4),
         ArrayField('data_dir',
                    count=lambda obj: obj.rva_count,
                    element=DataDirectory()),
@@ -174,26 +174,26 @@ class PE64ExtHeader(DataBlock):
 
 class PE32ExtHeader(DataBlock):
     fields = [
-        StructField('base_of_data', 'I').convert(hex),
-        StructField('image_base', 'I'),
-        StructField('section_alignment', 'I'),
-        StructField('file_alignment', 'I'),
-        StructField('major_os_ver', 'H'),
-        StructField('minor_os_ver', 'H'),
-        StructField('major_subs_ver', 'H'),
-        StructField('minor_subs_ver', 'H'),
-        StructField('win32_version', 'I'),
-        StructField('image_size', 'I'),
-        StructField('headers_size', 'I'),
-        StructField('checksum', 'I'),
-        StructField('subsystem', 'H'),
-        StructField('dll_chars', 'H'),
-        StructField('stacke_reserve_size', 'Q'),
-        StructField('stacke_commit_size', 'Q'),
-        StructField('heap_reserve_size', 'Q'),
-        StructField('heap_commit_size', 'Q'),
-        StructField('loader_flags', 'I'),
-        StructField('rva_count', 'I'),
+        NumberField('base_of_data', 4).convert(hex),
+        NumberField('image_base', 4),
+        NumberField('section_alignment', 4),
+        NumberField('file_alignment', 4),
+        NumberField('major_os_ver', 2),
+        NumberField('minor_os_ver', 2),
+        NumberField('major_subs_ver', 2),
+        NumberField('minor_subs_ver', 2),
+        NumberField('win32_version', 4),
+        NumberField('image_size', 4),
+        NumberField('headers_size', 4),
+        NumberField('checksum', 4),
+        NumberField('subsystem', 2),
+        NumberField('dll_chars', 2),
+        NumberField('stacke_reserve_size', 8),
+        NumberField('stacke_commit_size', 8),
+        NumberField('heap_reserve_size', 8),
+        NumberField('heap_commit_size', 8),
+        NumberField('loader_flags', 4),
+        NumberField('rva_count', 4),
         ArrayField('data_dir',
                    count=lambda obj: obj.rva_count,
                    element=DataDirectory()),
@@ -202,17 +202,18 @@ class PE32ExtHeader(DataBlock):
 
 class ImageSection(DataBlock):
     fields = [
-        StructField('name', '8s').convert(bytes.decode),
-        StructField('misc', 'I'),
-        StructField('virtual_addr', 'I').convert(hex),
-        StructField('size_of_raw', 'I').convert(hex),
-        StructField('pointer_to_raw', 'I').convert(hex),
-        StructField('pointer_to_reloc', 'I'),
-        StructField('pointer_to_linenum', 'I'),
-        StructField('num_reloc', 'H'),
-        StructField('num_linemnum', 'H'),
-        StructField('characts', 'I'),
+        StringField('name', 8),
+        NumberField('misc', 4),
+        NumberField('virtual_addr', 4).convert(hex),
+        NumberField('size_of_raw', 4).convert(hex),
+        NumberField('pointer_to_raw', 4).convert(hex),
+        NumberField('pointer_to_reloc', 4),
+        NumberField('pointer_to_linenum', 4),
+        NumberField('num_reloc', 2),
+        NumberField('num_linemnum', 2),
+        NumberField('characts', 4),
     ]
+
 
 class ExeFormat(DataBlock):
     byteorder = ByteOrder.BE
