@@ -1,6 +1,6 @@
 import io
-from ctypes import c_ushort, LittleEndianStructure, BigEndianStructure, sizeof
 from enum import Enum, IntEnum
+from typing import List
 
 
 class EEnum(IntEnum):
@@ -111,7 +111,7 @@ def reorganize_meta_compact(obj):
 
 
 class Element(object):
-    byteorder = None
+    byteorder = ByteOrder.LE
     size = None
     offset = None
     func_opt = None
@@ -121,6 +121,7 @@ class Element(object):
     def __init__(self, name=None):
         self.name = name
         self.parent = None
+        self.display_name = None
 
     def read_value(self, stream, obj):
         raise NotImplementedError()
@@ -160,8 +161,9 @@ class Element(object):
                 meta = {'offset': pos, 'size': size}
                 self.write_metainfo(meta, val)
                 obj['$' + self.name] = meta
-
-        return obj
+            return obj
+        else:
+            return val
 
     def parse_stream(self, stream, to_meta=False, compact_meta=False):
         self.with_meta = to_meta
@@ -207,6 +209,14 @@ class Element(object):
 
     def set_size(self, size):
         self.size = size
+        return self
+
+    def display(self, name):
+        self.display_name = name
+        return self
+
+    def set_bigendian(self):
+        self.byteorder = ByteOrder.BE
         return self
 
     # Metainfo
@@ -269,49 +279,86 @@ class ObjectElement(Element):
         raise NotImplementedError()
 
 
-class BitField:
+class BitField(Element):
     def __init__(self, name, size):
-        self.name = name
+        super().__init__(name)
         self.size = size
+
+    def read_value(self, stream, obj):
+        raise Exception('Field must be in BitParser')
+
+
+def _read_bits_be(data, s, ind, shift):
+    v = 0
+    while s > 0:
+        b = data[ind] >> shift
+        r = 8 - shift  # Bit remains
+
+        if s > r:
+            v = v << r
+            v |= b
+            s -= r
+            ind += 1
+            shift = 0
+        else:
+            v = v << s
+            v |= b & (0xff >> (8 - s))
+            shift += s
+            s = 0
+    return v, ind, shift
+
+
+def _read_bits_le(data, s, ind, shift):
+    v = 0
+    while s > 0:
+        if ind >= len(data):
+            raise Exception()
+        b = data[ind] & (0xff >> shift)
+        r = 8 - shift  # Bit remains
+
+        if s >= r:
+            v = v << r
+            v |= b
+            s -= r
+            ind += 1
+            shift = 0
+        else:
+            v = v << s
+            v |= b >> (8 - s - shift)
+            shift += s
+            s = 0
+    return v, ind, shift
 
 
 class BitParser(ObjectElement):
     fields = None
 
-    def __init__(self, name=None, fields=None, bitorder=ByteOrder.BE):
-        """
-        :type fields: BitField[]
-        """
+    def __init__(self, name=None, fields: List[BitField] = None, bitorder: ByteOrder = ByteOrder.BE):
         super().__init__(name)
         if fields:
             self.fields = fields
         self.bitorder = bitorder
-        self.struct = None
-        self.bytes_count = None
+
+        bitcount = 0
+        for f in self.fields:
+            bitcount += f.size
+        self.bytes_count = bitcount // 8
+        if bitcount % 8 > 0:
+            self.bytes_count += 1
 
     def read_fields(self, stream, obj):
-        if not self.struct:
-            self.init_struct()
-
         data = stream.read(self.bytes_count)
-        s = self.struct.from_buffer_copy(data)
+        ind = 0  # Current position in data
+        shift = 0  # Bit shift in current position
+
+        if self.is_bigendian():
+            func = _read_bits_be
+        else:
+            func = _read_bits_le
+
         for f in self.fields:
-            v = s.__getattribute__(f.name)
+            v, ind, shift = func(data, f.size, ind, shift)
             obj[f.name] = v
-
-    def init_struct(self):
-        sf = []  # fields for Structure
-        for f in self.fields:
-            sf.append((f.name, c_ushort, f.size))  # TODO Определение типа
-
-        superclass = self.bitorder == ByteOrder.BE and BigEndianStructure or LittleEndianStructure
-
-        class BitStruct(superclass):
-            _pack_ = 1
-            _fields_ = sf
-
-        self.struct = BitStruct
-        self.bytes_count = sizeof(BitStruct)
 
 
 class ArrayField(Element):
@@ -320,7 +367,7 @@ class ArrayField(Element):
         self.count = count
         self.element = element
         self.element.set_parent(self)
-        assert(self.element.name is None)
+        assert (self.element.name is None)
 
     def read_value(self, stream, obj):
         count = get_value(self.count, obj)

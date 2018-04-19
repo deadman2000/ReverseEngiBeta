@@ -6,28 +6,26 @@ from structure import *
 class TCPFormat(DataBlock):
     byteorder = ByteOrder.LE
     fields = [
-        NumberField('source_port', 2),
-        NumberField('dest_port', 2),
-        NumberField('sn', 4),
-        NumberField('ack_sn', 4),
+        NumberField('src_port', 2),
+        NumberField('dest_port', 2).display('Destination Port'),
+        NumberField('sn', 4).display('Sequence Number'),
+        NumberField('ack_sn', 4).display('Acknowledgment Number'),
         BitParser(fields=[
-            BitField('header_size', 4),
-            BitField('res', 6),
-            BitField('flags', 6)
+            BitField('header_size', 4).display('Header Size'),
+            BitField('res', 3).display('Reserved'),
+            BitField('flags', 9).display('Flags')
         ]),
         NumberField('size', 2),
-        NumberField('check_sum', 2),
-        NumberField('priority', 2),
-        ArrayField(
-            name='options',
-            count=lambda p: p.header_size - 5,
-            element=NumberField(bytes_count=4)),
+        NumberField('checksum', 2),
+        NumberField('urg', 2).display('Urgen Pointer'),
+        BytesField('options', lambda p: (p.header_size - 5) * 4).convert(bytes.hex),
         BytesField(name='data')
     ]
 
 
 # http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xml
 class IPProtocol(EEnum):
+    ICMP = 1
     TCP = 6
     UDP = 17
 
@@ -73,10 +71,7 @@ class IPFormat(DataBlock):
         NumberField('sum', 2),
         IPAddr('source'),
         IPAddr('dest'),
-        ArrayField(
-            name='options',
-            count=lambda p: p.header_size - 5,
-            element=NumberField(bytes_count=4)),
+        BytesField('options', lambda p: (p.header_size - 5) * 4).convert(bytes.hex),
         IPDataField()
     ]
 

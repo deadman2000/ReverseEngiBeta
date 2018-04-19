@@ -41,3 +41,6 @@
 - Плагины-фильтры
 - Конвертор/экстрактор
 	
+# Алтренативы
+
+https://marcin-chwedczuk.github.io/a-closer-look-at-portable-executable-msdos-stub

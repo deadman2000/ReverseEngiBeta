@@ -10,8 +10,8 @@ ETHERNET_DATA = '0007b4004d015404a660dc5e08004500006c2dd34000800600000a0a4e07719
 class TestStringMethods(unittest.TestCase):
     maxDiff = None
 
-    def test_bits(self):
-        bp = BitParser(fields=[
+    def test_bits_le(self):
+        obj = BitParser(fields=[
             BitField('a', 1),
             BitField('b', 1),
             BitField('c', 1),
@@ -20,18 +20,48 @@ class TestStringMethods(unittest.TestCase):
             BitField('f', 1),
             BitField('g', 1),
             BitField('h', 1),
-        ])
-        # bp.parse_bytes(b'\x64')
+
+            BitField('i', 1),
+            BitField('j', 1),
+            BitField('k', 1),
+            BitField('l', 1),
+            BitField('m', 1),
+            BitField('n', 1),
+            BitField('o', 1),
+            BitField('p', 1),
+        ]).parse_bytes(b'\x64\xc7')
+        self.assertDictEqual(obj, {'a': 0, 'b': 1, 'c': 1, 'd': 0, 'e': 0, 'f': 1, 'g': 0, 'h': 0, 'i': 1, 'j': 1, 'k': 0, 'l': 0, 'm': 0, 'n': 1, 'o': 1, 'p': 1})
+
+    def test_bits_be(self):
+        obj = BitParser(fields=[
+            BitField('a', 1),
+            BitField('b', 1),
+            BitField('c', 1),
+            BitField('d', 1),
+            BitField('e', 1),
+            BitField('f', 1),
+            BitField('g', 1),
+            BitField('h', 1),
+
+            BitField('i', 1),
+            BitField('j', 1),
+            BitField('k', 1),
+            BitField('l', 1),
+            BitField('m', 1),
+            BitField('n', 1),
+            BitField('o', 1),
+            BitField('p', 1),
+        ]).set_bigendian().parse_bytes(b'\x64\xc7')
+        self.assertDictEqual(obj, {'a': 0, 'b': 0, 'c': 1, 'd': 0, 'e': 0, 'f': 1, 'g': 1, 'h': 0, 'i': 1, 'j': 1, 'k': 1, 'l': 0, 'm': 0, 'n': 0, 'o': 1, 'p': 1})
 
     def test_optional(self):
-        block = DataBlock(fields=[
+        obj = DataBlock(fields=[
             NumberField('a', 1).optional(True),
             NumberField('b', 1).optional(False),
             NumberField('c', 1),
             NumberField('d', 1).optional(lambda o: o.c == 2),
             NumberField('e', 1).optional(lambda o: o.c == 48)
-        ])
-        obj = block.parse_bytes(b'\x01\x02\x03')
+        ]).parse_bytes(b'\x01\x02\x03')
         self.assertDictEqual(obj, {'a': 1, 'c': 2, 'd': 3})
 
     def test_eth_ip_tcp(self):
@@ -47,13 +77,13 @@ class TestStringMethods(unittest.TestCase):
                    'header_size': 5,
                    'id': 11731,
                    'offset': 0,
-                   'options': [],
+                   'options': '',
                    'protocol': IPProtocol.TCP,
                    'size': 108,
                    'source': IPv4Address('10.10.78.7'),
                    'sum': 0,
                    'tcp': {'ack_sn': 3888920308,
-                           'check_sum': 25841,
+                           'checksum': 25841,
                            'data': b'\x13BitTorrent protocol\x00\x00\x00\x00'
                                    b'\x00\x18\x00\x05O\xbd\xaf\xe7V\xfc\xb6)'
                                    b'\xce\x19\x17\x8d\xe3\n&\xaf[\x93L\xa6-qB4030-OrrZUvtR'
@@ -61,19 +91,19 @@ class TestStringMethods(unittest.TestCase):
                            'dest_port': 9461,
                            'flags': 24,
                            'header_size': 5,
-                           'options': [],
-                           'priority': 0,
+                           'options': '',
                            'res': 0,
                            'size': 258,
                            'sn': 1096583149,
-                           'source_port': 32188},
+                           'src_port': 32188,
+                           'urg': 0},
                    'ttl': 128,
                    'version': 4},
             'padding': b'',
             'source': '54:4:a6:60:dc:5e',
             'type': EthernetDataType.IPv4
         }
-        pprint.pprint(result)
+        #pprint.pprint(result)
         self.assertDictEqual(result, example)
 
 

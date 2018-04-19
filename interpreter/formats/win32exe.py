@@ -9,6 +9,8 @@ import datetime
 # http://www.delorie.com/djgpp/doc/exe/
 # http://www.tavi.co.uk/phobos/exeformat.html
 
+# http://www.ntcore.com/files/richsign.htm
+
 
 def hex_2(val):
     return '%04X' % val

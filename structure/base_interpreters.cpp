@@ -35,16 +35,16 @@ public:
         if (_signed)
         {
             if (_byte_order_be)
-                return QString::number(getValueBE<qlonglong>(data), _base);
+                return QString::number(getValueBESign(data), _base);
             else
-                return QString::number(getValueLE<qlonglong>(data), _base);
+                return QString::number(getValueLESign(data), _base);
         }
         else
         {
             if (_byte_order_be)
-                return QString::number(getValueBE<qulonglong>(data), _base);
+                return QString::number(getValueBEUnsign(data), _base);
             else
-                return QString::number(getValueLE<qulonglong>(data), _base);
+                return QString::number(getValueLEUnsign(data), _base);
         }
     }
 
@@ -180,7 +180,7 @@ public:
 
 void init_base_interpreters()
 {
-    engine().registerInterpreter(new NumberInterpreter(8, SIGNED, BIG_ENDIAN));
+    engine().registerInterpreter(new NumberInterpreter(4, SIGNED, BIG_ENDIAN));
     engine().registerInterpreter(new SByteInterpreter);
     engine().registerInterpreter(new UByteInterpreter);
     engine().registerInterpreter(new StringZeroTermInterpreter);

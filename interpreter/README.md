@@ -7,8 +7,6 @@
 * Поддержка winpcap (https://github.com/orweis/winpcapy)
 
 ## TODO
-* Избавиться от зависимости от CTypes
-    - Поддержка разных битов
 * Поддержка float и double
 * Выходной бинарный формат (msgpack например)
     - https://gist.github.com/delimitry/7c56945c428ec78ebf2a
