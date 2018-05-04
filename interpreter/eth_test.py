@@ -7,5 +7,6 @@ ETHERNET_DATA = '005056c00008000c29be8ca60800480000486046400040069084c0a89f81c0a
 
 ethernet = EthernetFormat()
 data = bytes.fromhex(ETHERNET_DATA)
+#data = b'\x01\x00^\x7f\xff\xfa\x00PV\xc0\x00\x08\x08\x00E\x00\x00\xca1\xa2\x00\x00\x01\x117\xdd\xc0\xa8\x9f\x01\xef\xff\xff\xfa\xe2R\x07l\x00\xb6\xc2dM-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\nMAN: "ssdp:discover"\r\nMX: 1\r\nST: urn:dial-multiscreen-org:service:dial:1\r\nUSER-AGENT: Google Chrome/66.0.3359.139 Windows\r\n\r\n'
 result = ethernet.parse_bytes(data)
 pprint(result)

@@ -6,8 +6,8 @@ from structure import *
 class TCPFormat(DataBlock):
     byteorder = ByteOrder.LE
     fields = [
-        NumberField('src_port', 2),
-        NumberField('dest_port', 2).display('Destination Port'),
+        NumberField('src_port', 2).display('Source Port'),
+        NumberField('dst_port', 2).display('Destination Port'),
         NumberField('sn', 4).display('Sequence Number'),
         NumberField('ack_sn', 4).display('Acknowledgment Number'),
         BitParser(fields=[
@@ -23,6 +23,18 @@ class TCPFormat(DataBlock):
     ]
 
 
+# https://ru.wikipedia.org/wiki/UDP
+class UDPFormat(DataBlock):
+    byteorder = ByteOrder.LE
+    fields = [
+        NumberField('src_port', 2).display('Source Port'),
+        NumberField('dst_port', 2).display('Destination Port'),
+        NumberField('size', 2),
+        NumberField('checksum', 2),
+        BytesField(name='data').validation(lambda v, obj: len(v) == obj.size - 8)
+    ]
+
+
 # http://www.iana.org/assignments/protocol-numbers/protocol-numbers.xml
 class IPProtocol(EEnum):
     ICMP = 1
@@ -35,12 +47,15 @@ class IPDataField(Element):
     def __init__(self):
         super().__init__()
         self.tcp = TCPFormat()
+        self.udp = UDPFormat()
 
     def read_value(self, stream, obj):
         size = obj.size - obj.header_size * 4
         data = stream.read(size)
         if obj.protocol == IPProtocol.TCP:
             obj['tcp'] = self.tcp.parse_bytes(data)
+        elif obj.protocol == IPProtocol.UDP:
+            obj['udp'] = self.udp.parse_bytes(data)
         else:
             obj['other'] = data
 

@@ -110,8 +110,12 @@ def reorganize_meta_compact(obj):
     return result
 
 
+class ValidationError(Exception):
+    pass
+
+
 class Element(object):
-    byteorder = ByteOrder.LE
+    byteorder = None
     size = None
     offset = None
     func_opt = None
@@ -122,6 +126,7 @@ class Element(object):
         self.name = name
         self.parent = None
         self.display_name = None
+        self.validator = None
 
     def read_value(self, stream, obj):
         raise NotImplementedError()
@@ -154,6 +159,10 @@ class Element(object):
         if self.converters is not None:
             for c in self.converters:
                 val = c(val)
+
+        if self.validator:
+            if not self.validator(val, obj):
+                raise ValidationError()
 
         if self.name:  # If name is set, this element must be field id obj, else is parsed into obj
             obj[self.name] = val
@@ -219,6 +228,10 @@ class Element(object):
         self.byteorder = ByteOrder.BE
         return self
 
+    def validation(self, func):
+        self.validator = func
+        return self
+
     # Metainfo
 
     def write_metainfo(self, meta, obj):
@@ -247,7 +260,7 @@ class NumberField(Element):
 
         data = stream.read(self.bytes_count)
         if len(data) < self.bytes_count:
-            raise Exception("Unexcepted end of data")
+            raise EOFError()
 
         val = 0
         if self.is_bigendian():  # TODO Signed support
@@ -362,10 +375,10 @@ class BitParser(ObjectElement):
 
 
 class ArrayField(Element):
-    def __init__(self, name, count, element):
+    def __init__(self, name, element, count=None):
         super().__init__(name)
-        self.count = count
         self.element = element
+        self.count = count
         self.element.set_parent(self)
         assert (self.element.name is None)
 
@@ -374,19 +387,37 @@ class ArrayField(Element):
         with_meta = self.is_write_meta()
         if with_meta:
             meta = []
+        else:
+            meta = None
+
         arr = []
-        for _ in range(count):
-            if with_meta:
-                pos = stream.tell()
 
-            e = self.element.read_stream(stream)
-            arr.append(e)
+        if count is not None:
+            for _ in range(count):
+                e = self._read_element(stream, obj, meta)
+                arr.append(e)
+        else:
+            while True:
+                try:  # TODO: Best implementation w/o exceptions
+                    e = self._read_element(stream, obj, meta)
+                    arr.append(e)
+                except EOFError:
+                    break
 
-            if with_meta:
-                size = stream.tell() - pos
-                meta.append({'offset': pos, 'size': size})
-                obj['$' + self.name + '[]'] = meta
         return arr
+
+    def _read_element(self, stream, obj, meta):
+        if meta:
+            pos = stream.tell()
+
+        e = self.element.read_stream(stream)
+
+        if meta:
+            size = stream.tell() - pos
+            meta.append({'offset': pos, 'size': size})
+            obj['$' + self.name + '[]'] = meta
+
+        return e
 
 
 class BytesField(Element):

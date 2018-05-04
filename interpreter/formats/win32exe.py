@@ -169,8 +169,8 @@ class PE64ExtHeader(DataBlock):
         NumberField('loader_flags', 4),
         NumberField('rva_count', 4),
         ArrayField('data_dir',
-                   count=lambda obj: obj.rva_count,
-                   element=DataDirectory()),
+                   element=DataDirectory(),
+                   count=lambda obj: obj.rva_count),
     ]
 
 
@@ -197,8 +197,8 @@ class PE32ExtHeader(DataBlock):
         NumberField('loader_flags', 4),
         NumberField('rva_count', 4),
         ArrayField('data_dir',
-                   count=lambda obj: obj.rva_count,
-                   element=DataDirectory()),
+                   element=DataDirectory(),
+                   count=lambda obj: obj.rva_count),
     ]
 
 
@@ -231,13 +231,12 @@ class ExeFormat(DataBlock):
                 PE64ExtHeader('pe_opt_header').optional(lambda obj: obj.pe_opt_header.magic == PeFormat.PE64),
             ]).set_size(lambda obj: obj.coff_header.size_opt),
             ArrayField('sections',
-                       count=lambda obj: obj.coff_header.sections,
-                       element=ImageSection()),
+                       element=ImageSection(),
+                       count=lambda obj: obj.coff_header.sections),
 
         ]).optional(lambda obj: obj.dos_header.reloc_table_offset >= 64),
 
-        ArrayField(
-            name='relocs',
-            count=lambda obj: obj.dos_header.num_relocs,
-            element=ExeReloc()).set_offset(lambda obj: obj.dos_header.reloc_table_offset),
+        ArrayField('relocs',
+                   element=ExeReloc(),
+                   count=lambda obj: obj.dos_header.num_relocs).set_offset(lambda obj: obj.dos_header.reloc_table_offset),
     ]
