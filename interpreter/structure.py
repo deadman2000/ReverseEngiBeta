@@ -88,17 +88,20 @@ def reorganize_meta_compact(obj):
         if isinstance(val, AttrDict):
             val = reorganize_meta_compact(val)
         elif isinstance(val, list):
-            obj_list = {}
-            list_meta = obj['$' + key + '[]']
             for i in range(len(val)):
-                lm = list_meta[i]
-                obj_list[i] = [
-                    lm['offset'],
-                    lm['size'],
-                    0,
-                    reorganize_meta_compact(val[i])
-                ]
-            val = obj_list
+                r = reorganize_meta_compact(val[i])
+                val[i] = r
+        #     obj_list = {}
+        #     list_meta = obj['$' + key + '[]']
+        #     for i in range(len(val)):
+        #         lm = list_meta[i]
+        #         obj_list[i] = [
+        #             lm['offset'],
+        #             lm['size'],
+        #             0,
+        #             reorganize_meta_compact(val[i])
+        #         ]
+        #     val = obj_list
 
         result[key] = [
             m['offset'],

@@ -34,5 +34,6 @@
         <file>icons/ic_save_white_24px.svg</file>
         <file>icons/ic_folder_open_white_24px.svg</file>
         <file>fileview/StructureView.qml</file>
+        <file>fileview/SectionDrawer2.qml</file>
     </qresource>
 </RCC>

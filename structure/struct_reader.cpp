@@ -46,6 +46,27 @@ Sector * parse_struct(const msgpack::object_map & map)
     return sector;
 }
 
+Sector * parse_array(const QString & parent_name, const msgpack::object_array & array)
+{
+    Sector * sector = new Sector();
+    int i = 0;
+    for (auto const& obj : array) {
+        QString name = QString("%1[%2]").arg(parent_name).arg(i);
+        Block* block;
+
+        if (obj.type == type::ARRAY)
+            block = parse_block(name, obj.via.array);
+        else if (obj.type == type::MAP) {
+            block = parse_struct(obj.via.map);
+            block->setName(name);
+        }
+
+        sector->append(block);
+        ++i;
+    }
+    return sector;
+}
+
 Block * parse_block(const msgpack::object_kv & kv)
 {
     QString name = to_string(kv.key);
@@ -54,6 +75,7 @@ Block * parse_block(const msgpack::object_kv & kv)
     if (kv.val.type != type::ARRAY)
         qWarning() << name;
     Q_ASSERT(kv.val.type == type::ARRAY);
+
     return parse_block(name, kv.val.via.array);
 }
 
@@ -77,7 +99,7 @@ Block * parse_block(QString & name, const msgpack::object_array & arr)
         block = parse_struct(val.via.map);
         break;
     case type::ARRAY:
-        qWarning() << "Array not support" << name;
+        block = parse_array(name, val.via.array);
         break;
     default:
         block = new Block();
@@ -100,8 +122,8 @@ Sector *read_structure(QString &filePath)
     qDebug() << "Load" << filePath;
 
     QProcess process;
-    //process.start("python", {"D:\\Projects\\ReverseEngi\\ReverseEngiBeta\\interpreter\\parse_to_msgpack.py", "--in", filePath});
-    process.start("\"c:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\Python36_64\\python.exe\"", {"e:\\Projects\\ReverseEngiBeta\\interpreter\\parse_to_msgpack.py", "--in", filePath});
+    process.start("python", {"D:\\Projects\\ReverseEngi\\ReverseEngiBeta\\interpreter\\parse_to_msgpack.py", "--in", filePath});
+    //process.start("\"c:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\Python36_64\\python.exe\"", {"e:\\Projects\\ReverseEngiBeta\\interpreter\\parse_to_msgpack.py", "--in", filePath});
     if (!process.waitForFinished())
     {
         qDebug() << process.errorString();

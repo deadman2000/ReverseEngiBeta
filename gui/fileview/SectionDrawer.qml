@@ -36,17 +36,17 @@ Canvas { // Отрисовка секций файла
         var sx = startPos.x - px
         var sy = startPos.y - py
         var endPos   = symPos(end)
-        var erx = endPos.x + symWith + px
+        var erx = endPos.x + symWith + px - style.borderWidth + 1
 
         ctx.beginPath()
 
         if (start.y === end.y){
             // Выделение на одной строке
-            ctx.rect(sx, sy, erx - sx, rowHeight + py*2)
+            ctx.rect(sx, sy, erx - sx, rowHeight + py*2 - style.borderWidth)
         } else {
             var s1 = symPos(Qt.point(15, start.y)) // Координаты краев
             var e1 = symPos(Qt.point(0, end.y))
-            var s1x = s1.x + symWith + px
+            var s1x = s1.x + symWith + px - style.borderWidth + 1
             var e1x = e1.x - px
             var ey = endPos.y - py
 
@@ -56,16 +56,17 @@ Canvas { // Отрисовка секций файла
                     |_________     |_________|s1x
                     |e1x____eP|erx           |     */
 
-                ctx.rect(sx, sy, s1x - sx, rowHeight + py*2)
-                ctx.rect(e1x, ey, erx - e1x, rowHeight + py*2)
+                ctx.rect(sx, sy, s1x - sx, rowHeight + py*2 - style.borderWidth)
+                ctx.rect(e1x, ey, erx - e1x, rowHeight + py*2 - style.borderWidth)
             } else {
                 // Выделение в несколько строк одним 8-угольником
                 /*  |       sP_______________|
-                    |________|               |s1x
-                    |                  ______|
-                    |e1x____________eP|erx   |     */
+            sby_ _ _|________|               |s1x
+                    |                  ______|_ _ _ ey
+                    |e1x____________eP|erx   |_ _ _ eby  */
 
-                var eby = endPos.y + rowHeight + py
+                ey -= style.borderWidth
+                var eby = endPos.y + rowHeight + py - style.borderWidth
                 var sby = startPos.y + rowHeight + py
 
                 ctx.moveTo(sx, sy);

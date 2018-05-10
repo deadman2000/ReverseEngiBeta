@@ -31,7 +31,8 @@ Item {
     property alias model: list.model
     property alias contentY: list.contentY
 
-    SectionDrawer { paddingX: G.hexLetter.width / 2; }
+    //SectionDrawer { paddingX: G.hexLetter.width / 2; }
+    SectionDrawer2 { }
 
     ListView {
         id: list

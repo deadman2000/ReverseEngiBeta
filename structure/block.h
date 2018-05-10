@@ -19,7 +19,7 @@ protected:
     QString _typeName;
     QString _description;
     QString _valueStr;
-    AddressRange * _range;
+    AddressRange _range;
 
 public:
     Block();

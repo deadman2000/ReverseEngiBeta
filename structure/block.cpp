@@ -2,6 +2,35 @@
 
 #include "sector.h"
 
+static QList<QColor> PALETTE = {
+    QColor(0xF44336),
+    QColor(0xE91E63),
+    QColor(0x9C27B0),
+    QColor(0x673AB7),
+    QColor(0x3F51B5),
+    QColor(0x2196F3),
+    QColor(0x03A9F4),
+    QColor(0x00BCD4),
+    QColor(0x009688),
+    QColor(0x4CAF50),
+    QColor(0x8BC34A),
+    QColor(0xCDDC39),
+    QColor(0xFFEB3B),
+    QColor(0xFFC107),
+    QColor(0xFF9800),
+    QColor(0xFF5722),
+    QColor(0x795548),
+    QColor(0x9E9E9E),
+    QColor(0x607D8B)
+};
+static int NEXT_COLOR_IND = 0;
+
+QColor & getNextColor() {
+    int c = NEXT_COLOR_IND;
+    NEXT_COLOR_IND = (NEXT_COLOR_IND + 1) % PALETTE.size();
+    return PALETTE[c];
+}
+
 Block::Block()
     : _dataSource(nullptr)
     , _parent(nullptr)
@@ -10,6 +39,13 @@ Block::Block()
     , _isValid(true)
     , _range(nullptr)
 {
+    _range.setIsBlock(true);
+
+    QColor & color = getNextColor();
+    QColor bgrColor = color;
+    bgrColor.setAlpha(25);
+
+    _range.setStyle(new AreaStyle(bgrColor, color, 2));
 }
 
 Block::~Block()
@@ -49,6 +85,7 @@ Sector *Block::parent() const
 void Block::setOffset(int offset)
 {
     _offset = offset;
+    _range.setBegin(offset);
 }
 
 int Block::offset() const
@@ -56,15 +93,16 @@ int Block::offset() const
     return _offset;
 }
 
-int Block::size() const
-{
-    return _size;
-}
-
 void Block::setSize(int value)
 {
     Q_ASSERT(value >= 0);
     _size = value;
+    _range.setEnd(_offset + _size - 1);
+}
+
+int Block::size() const
+{
+    return _size;
 }
 
 bool Block::isValid() const
@@ -91,13 +129,7 @@ Sector *Block::as_sector()
 
 AddressRange *Block::range()
 {
-    if (_range) return _range;
-
-    AddressRange * range = new AddressRange(nullptr, _offset, _offset + _size - 1);
-    range->setIsBlock(true);
-    range->setStyle(new AreaStyle(QColor(0, 255, 0, 25), QColor(0, 255, 0), 2));
-
-    return _range = range;
+    return &_range;
 }
 
 void Block::setName(const QString &name)
