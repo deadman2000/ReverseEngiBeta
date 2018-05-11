@@ -4,9 +4,10 @@ Item {
     width: list.contentItem.childrenRect.width
     height: parent.height
 
-    property real textPadding: 8
+    property real textPadding: G.hexLetter.width / 2
 
-    property real symWith: G.hexLetter.width * 2
+    property real symWidth: G.hexLetter.width * 2
+    property real cellWidth: G.hexLetter.width * 3
 
     function symPos(coord)  // Координаты символа
     {
@@ -31,8 +32,9 @@ Item {
     property alias model: list.model
     property alias contentY: list.contentY
 
-    //SectionDrawer { paddingX: G.hexLetter.width / 2; }
-    SectionDrawer2 { }
+    SectionDrawer {
+        parent: list.contentItem
+    }
 
     ListView {
         id: list

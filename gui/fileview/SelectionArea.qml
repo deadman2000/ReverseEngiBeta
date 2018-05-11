@@ -17,6 +17,14 @@ MouseArea {
         }
     }
 
+    onDoubleClicked: {
+        var p = symAt(mouse)
+        if (p) {
+            var address = pointToAddress(p)
+            console.log(address)
+        }
+    }
+
     onPositionChanged: {
         if (!pressed) return
         if (mouse.x < 0 || mouse.x > width) return

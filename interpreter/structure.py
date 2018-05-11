@@ -54,18 +54,14 @@ def reorganize_meta(obj):
             continue
 
         m = obj['$' + key]
-        if m['size'] <= 0:
-            assert (m['size'] == 0)
+        if m['size'] == 0:
             continue
 
-        if isinstance(val, AttrDict):
+        assert (m['size'] > 0)
+
+        if isinstance(val, dict):
             val = reorganize_meta(val)
-        elif isinstance(val, list):
-            obj_list = []
-            list_meta = obj['$' + key + '[]']
-            for i in range(len(val)):
-                obj_list.append({'value': reorganize_meta(val[i]), **list_meta[i]})
-            val = obj_list
+        assert (not isinstance(val, list))
 
         m['value'] = val
 
@@ -85,23 +81,9 @@ def reorganize_meta_compact(obj):
             assert (m['size'] == 0)
             continue
 
-        if isinstance(val, AttrDict):
+        if isinstance(val, dict):
             val = reorganize_meta_compact(val)
-        elif isinstance(val, list):
-            for i in range(len(val)):
-                r = reorganize_meta_compact(val[i])
-                val[i] = r
-        #     obj_list = {}
-        #     list_meta = obj['$' + key + '[]']
-        #     for i in range(len(val)):
-        #         lm = list_meta[i]
-        #         obj_list[i] = [
-        #             lm['offset'],
-        #             lm['size'],
-        #             0,
-        #             reorganize_meta_compact(val[i])
-        #         ]
-        #     val = obj_list
+        assert (not isinstance(val, list))
 
         result[key] = [
             m['offset'],
@@ -161,7 +143,10 @@ class Element(object):
 
         if self.converters is not None:
             for c in self.converters:
-                val = c(val)
+                try:
+                    val = c(val)
+                except Exception:
+                    pass
 
         if self.validator:
             if not self.validator(val, obj):
@@ -170,6 +155,11 @@ class Element(object):
         if self.name:  # If name is set, this element must be field id obj, else is parsed into obj
             obj[self.name] = val
             if self.is_write_meta():
+                exval = obj.get('$' + self.name)
+                if exval is not None:
+                    pos = exval['offset']
+                    size += exval['size']
+
                 meta = {'offset': pos, 'size': size}
                 self.write_metainfo(meta, val)
                 obj['$' + self.name] = meta
@@ -386,41 +376,55 @@ class ArrayField(Element):
         assert (self.element.name is None)
 
     def read_value(self, stream, obj):
-        count = get_value(self.count, obj)
-        with_meta = self.is_write_meta()
-        if with_meta:
-            meta = []
-        else:
-            meta = None
+        if self.is_write_meta():
+            return self._read_value_meta(stream, obj)
 
         arr = []
-
+        count = get_value(self.count, obj)
         if count is not None:
             for _ in range(count):
-                e = self._read_element(stream, obj, meta)
+                e = self.element.read_stream(stream)
                 arr.append(e)
         else:
             while True:
                 try:  # TODO: Best implementation w/o exceptions
-                    e = self._read_element(stream, obj, meta)
+                    e = self.element.read_stream(stream)
                     arr.append(e)
                 except EOFError:
                     break
 
         return arr
 
-    def _read_element(self, stream, obj, meta):
-        if meta:
-            pos = stream.tell()
+    def _read_value_meta(self, stream, obj):
+        count = get_value(self.count, obj)
+        elements = {}
+        i = 0
 
+        if count is not None:
+            for _ in range(count):
+                elname = self.name + '[' + str(i) + ']'
+                e, pos, size = self._read_element_meta(stream, obj)
+                elements[elname] = e
+                elements['$' + elname] = {'offset': pos, 'size': size}
+                i += 1
+        else:
+            while True:
+                try:  # TODO: Best implementation w/o exceptions
+                    elname = self.name + '[' + str(i) + ']'
+                    e, pos, size = self._read_element_meta(stream, obj)
+                    elements[elname] = e
+                    elements['$' + elname] = {'offset': pos, 'size': size}
+                    i += 1
+                except EOFError:
+                    break
+
+        return elements
+
+    def _read_element_meta(self, stream, obj):
+        pos = stream.tell()
         e = self.element.read_stream(stream)
-
-        if meta:
-            size = stream.tell() - pos
-            meta.append({'offset': pos, 'size': size})
-            obj['$' + self.name + '[]'] = meta
-
-        return e
+        size = stream.tell() - pos
+        return e, pos, size
 
 
 class BytesField(Element):

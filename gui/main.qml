@@ -83,34 +83,6 @@ ApplicationWindow {
             }
         }
 
-    footer: ToolBar { // StatusBar
-        height: 24
-
-        RowLayout {
-            anchors.fill: parent
-            spacing: 0
-
-            Item { width: 16; height: 1 }
-
-            Label {
-                Layout.fillWidth: true
-                text: currentFile.document.fileName
-            }
-
-            Label {
-                text: "Selection: " + currentFile.selection.size
-            }
-
-            Item { width: 16; height: 1 }
-
-            Label {
-                text: "Position: " + currentFile.cursor.offset
-            }
-
-            Item { width: 16; height: 1 }
-        }
-    }
-
     Component.onCompleted: {
         currentFile.openFile('c:/Windows/explorer.exe')
     }
@@ -138,7 +110,7 @@ ApplicationWindow {
         }
     }
 
-    /*DropArea {
+    DropArea {
         anchors.fill: parent
         onEntered: {
             if (drag.hasUrls){
@@ -148,8 +120,37 @@ ApplicationWindow {
         }
         onDropped: {
             if (drop.hasUrls){
-                currentFile.openFile(drop.urls)
+                currentFile.openFile(drop.urls[0])
             }
         }
-    }*/
+    }
+
+    footer: ToolBar { // StatusBar
+        height: 24
+
+        RowLayout {
+            anchors.fill: parent
+            spacing: 0
+
+            Item { width: 16; height: 1 }
+
+            Label {
+                Layout.fillWidth: true
+                text: currentFile.document.fileName
+            }
+
+            Label {
+                visible: currentFile.selection.size > 0
+                text: "Selection: " + currentFile.selection.size
+            }
+
+            Item { width: 16; height: 1 }
+
+            Label {
+                text: "Position: " + currentFile.cursor.offset
+            }
+
+            Item { width: 16; height: 1 }
+        }
+    }
 }

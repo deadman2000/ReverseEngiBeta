@@ -1,19 +1,8 @@
 #include "addressrange.h"
 
 AddressRange::AddressRange(QObject *parent)
-    : QObject(parent)
-    , _begin(-1)
-    , _end(-1)
-    , _isSet(false)
-    , _style(nullptr)
-    , _selectedStyle(nullptr)
-    , _selected(false)
-    , _isBlock(false)
+    : AddressRange(parent, -1, -1)
 {
-    setStyle(new AreaStyle(this));
-
-    _selectedStyle = new AreaStyle(this);
-    _selectedStyle->setColor(QColor(255, 0, 0, 25));
 }
 
 AddressRange::AddressRange(QObject * parent, int begin, int end)
@@ -21,13 +10,11 @@ AddressRange::AddressRange(QObject * parent, int begin, int end)
     , _begin(begin)
     , _end(end)
     , _style(nullptr)
-    , _selectedStyle(nullptr)
     , _selected(false)
+    , _visible(true)
+    , _shadow(false)
 {
     setStyle(new AreaStyle(this));
-
-    _selectedStyle = new AreaStyle(this);
-    _selectedStyle->setColor(QColor(255, 0, 0, 25));
 }
 
 AddressRange::~AddressRange()
@@ -82,8 +69,6 @@ bool AddressRange::isSet() const
 
 AreaStyle *AddressRange::style() const
 {
-    if (_selected)
-        return _selectedStyle;
     return _style;
 }
 
@@ -108,6 +93,23 @@ void AddressRange::unselect()
     emit changed();
 }
 
+bool AddressRange::selected() const
+{
+    return _selected;
+}
+
+void AddressRange::setShadow(bool value)
+{
+    if (_shadow == value) return;
+    _shadow = value;
+    emit changed();
+}
+
+bool AddressRange::shadow() const
+{
+    return _shadow;
+}
+
 bool AddressRange::isBlock() const
 {
     return _isBlock;
@@ -116,4 +118,16 @@ bool AddressRange::isBlock() const
 void AddressRange::setIsBlock(bool isBlock)
 {
     _isBlock = isBlock;
+}
+
+bool AddressRange::visible() const
+{
+    return _visible;
+}
+
+void AddressRange::setVisible(bool visible)
+{
+    if (_visible == visible) return;
+    _visible = visible;
+    emit changed();
 }

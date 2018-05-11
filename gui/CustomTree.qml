@@ -130,7 +130,10 @@ Flickable {
         Column {
             property bool rowExpanded: false
             readonly property int rowLevel: parent ? parent.childLevel : 0
-            onRowExpandedChanged: if (!expanderLoader.item) expanderLoader.sourceComponent = expanderComponent
+            onRowExpandedChanged: {
+                if (!expanderLoader.item) expanderLoader.sourceComponent = expanderComponent
+                node.expanded = rowExpanded
+            }
 
             function expand() {
                 if (node.rowCount() === 0) return;
@@ -177,9 +180,11 @@ Flickable {
                     held = false
                 }
                 onDoubleClicked: {
-                    tree.doubleClicked()
-                    if (node.rowCount() > 0) {
-                        toggle()
+                    if (mouse.button === Qt.LeftButton){
+                        if (node.rowCount() > 0)
+                            toggle()
+                        else
+                            tree.doubleClicked()
                     }
                 }
 
@@ -240,7 +245,7 @@ Flickable {
                     anchors.right: parent.right
                     anchors.leftMargin: rowLevel * iconSize
 
-                    Image {
+                    Item {
                         width: iconSize; height: iconSize
 
                         Image {
@@ -257,7 +262,7 @@ Flickable {
                         }
                     }
 
-                    Image {
+                    Item {
                         id: rowItem
                         Layout.fillWidth: true
                         height: parent.height

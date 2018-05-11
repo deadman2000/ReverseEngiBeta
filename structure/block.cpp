@@ -19,9 +19,7 @@ static QList<QColor> PALETTE = {
     QColor(0xFFC107),
     QColor(0xFF9800),
     QColor(0xFF5722),
-    QColor(0x795548),
-    QColor(0x9E9E9E),
-    QColor(0x607D8B)
+    QColor(0x795548)
 };
 static int NEXT_COLOR_IND = 0;
 
@@ -110,11 +108,6 @@ bool Block::isValid() const
     return _isValid;
 }
 
-const QString &Block::name() const
-{
-    return _name;
-}
-
 void Block::remove()
 {
     Q_ASSERT(_parent != nullptr);
@@ -132,6 +125,11 @@ AddressRange *Block::range()
     return &_range;
 }
 
+const QString &Block::name() const
+{
+    return _name;
+}
+
 void Block::setName(const QString &name)
 {
     _name = name;
@@ -142,12 +140,12 @@ void Block::setDescription(const QString &description)
     _description = description;
 }
 
-void Block::setValueStr(const QString &valueStr)
-{
-    _valueStr = valueStr;
-}
-
 QString Block::valueStr() const
 {
     return _valueStr;
+}
+
+void Block::setValueStr(const QString &valueStr)
+{
+    _valueStr = valueStr;
 }

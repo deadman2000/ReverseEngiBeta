@@ -7,6 +7,9 @@
 * Поддержка winpcap (https://github.com/orweis/winpcapy)
 
 ## TODO
+* Массив на основе другого массива
+* Несколько регионов у одного поля (dos_header)
+* Переделать массив с размером "до конца", убрать исключения
 * Поддержка float и double
 * Выходной бинарный формат (msgpack например)
     - https://gist.github.com/delimitry/7c56945c428ec78ebf2a

@@ -3,13 +3,13 @@ import QtQuick 2.7
 Rectangle {
     property real padding: 1
 
-    width: symWith - padding * 2
+    width: symWidth - padding * 2
     height: 2
 
     readonly property point pos: symPos(cursor.pos)
     onPosChanged: cursorAnimation.restart()
 
-    x: pos.x + padding
+    x: pos.x
     y: pos.y + 1 + rowHeight - height - 1 - 2
 
     SequentialAnimation on color {

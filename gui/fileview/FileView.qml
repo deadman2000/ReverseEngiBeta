@@ -16,8 +16,6 @@ DockPanel {
             borderColor: Qt.rgba(1,0,0)
             borderWidth: 2
         }
-
-        onChanged: sectionsChanged()
     }
 
     property alias document: document
@@ -28,13 +26,6 @@ DockPanel {
     FileDocument {
         id: document
     }
-
-    Connections {
-        target: document
-        onSectionsChanged: sectionsChanged()
-    }
-
-    signal sectionsChanged
 
     function openFile(path)
     {
@@ -50,7 +41,6 @@ DockPanel {
     }
 
     property int topRow: 0
-    onTopRowChanged: sectionsChanged()
 
     property int listContentY: topRow * rowHeight - listTopPadding
     readonly property real scrollPosition: topRow / (fileModel.rows - rowsInScreen)
@@ -97,6 +87,35 @@ DockPanel {
         _selectedRange = range
     }
 
+    property var _focusedRange: null
+    function focusRange(range)
+    {
+        var i, s
+        if (_focusedRange === range) range = null
+
+        if (!range) {
+            for (i in document.sections){
+                s = document.sections[i]
+                if (s !== range)
+                    s.shadow = false
+            }
+            _focusedRange = null
+        }
+        else {
+            if (_focusedRange)
+                _focusedRange.shadow = true
+
+            range.shadow = false
+
+            _focusedRange = range
+            for (i in document.sections){
+                s = document.sections[i]
+                if (s !== range)
+                    s.shadow = true
+            }
+        }
+    }
+
     property int pressAddress: -1
 
     MouseArea {
@@ -140,9 +159,14 @@ DockPanel {
         }
 
         Rectangle {
-            width: 32
+            width: 16
             height: parent.height
             color: '#EEEEEE'
+        }
+
+        Item {
+            width: 16
+            height: parent.height
         }
 
         HexList {

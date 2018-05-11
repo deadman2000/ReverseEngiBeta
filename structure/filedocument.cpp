@@ -17,8 +17,14 @@ FileDocument::~FileDocument()
 
 void FileDocument::openFile(const QString &path)
 {
-    _fileName = path;
-    _data->openFile(path);
+    if (path.startsWith("file://")){
+        QUrl url(path);
+        if (url.isValid())
+            _fileName = url.toLocalFile();
+    }
+    else
+        _fileName = path;
+    _data->openFile(_fileName);
     loadStructure();
 }
 
@@ -42,21 +48,21 @@ void FileDocument::addSection(int begin, int end)
     AddressRange * section = new AddressRange(this, begin, end);
     section->setStyle(new AreaStyle(QColor(0, 255, 0, 25), QColor(0, 255, 0), 2));
     _sections.append(section);
-    connect(section, &AddressRange::changed, this, &FileDocument::sectionsChanged);
+
+    emit sectionsChanged();
 }
 
 void FileDocument::addBlockSections(Sector * sector)
 {
     for (Block * b : sector->childs())
     {
+        AddressRange * r = b->range();
+        r->setParent(this);
+        _sections.append(r);
+
         Sector * s = b->as_sector();
         if (s) {
             addBlockSections(s);
-        } else {
-            AddressRange * r = b->range();
-            r->setParent(this);
-            _sections.append(r);
-            connect(r, &AddressRange::changed, this, &FileDocument::sectionsChanged);
         }
     }
 }

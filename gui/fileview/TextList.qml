@@ -4,18 +4,18 @@ Item {
     width: list.contentItem.childrenRect.width
     height: parent.height
 
-    property real textPadding: 4
-    property real symWith: G.hexLetter.width
+    property real symWidth: G.hexLetter.width
+    property real cellWidth: symWidth
 
     function symPos(coord)
     {
-        return Qt.point(Math.round(coord.x * symWith + textPadding),
+        return Qt.point(Math.round(coord.x * symWidth),
                         Math.round(coord.y * rowHeight - list.contentY))
     }
 
     function symAt(point)  // Символ по координатам
     {
-        var x = point.x + list.contentX - textPadding
+        var x = point.x + list.contentX
         var y = point.y + list.contentY
 
         // Номер символа в строке
@@ -30,7 +30,10 @@ Item {
     property alias model: list.model
     property alias contentY: list.contentY
 
-    SectionDrawer { }
+    SectionDrawer {
+        parent: list.contentItem
+        borderPadding: 0
+    }
 
     ListView {
         id: list
@@ -44,8 +47,6 @@ Item {
             HexText {
                 text: fileText
                 height: rowHeight
-                leftPadding: textPadding
-                rightPadding: textPadding
 
                 property int rowIndex: index
             }

@@ -27,17 +27,11 @@ DockPanel {
         }
     }*/
 
-    function updateView()
-    {
-        if (currentFile.structure)
-            currentFile.structure.update()
-    }
-
     CustomTree {
         id: tree
         anchors.fill: parent
         model: currentFile.structure
-        onTreeChanged: updateView()
-        onDoubleClicked: currentFile.selectRange(tree.selectedNode.range())
+        onSelectedNodeChanged: currentFile.selectRange(selectedNode.range())
+        onDoubleClicked: currentFile.focusRange(selectedNode.range())
     }
 }

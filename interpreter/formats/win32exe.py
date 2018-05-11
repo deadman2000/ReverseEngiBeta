@@ -112,7 +112,7 @@ class DosExtHeader(DataBlock):
     ]
 
 
-class COFFHeader(DataBlock):
+class PEHeader(DataBlock):
     fields = [
         StringField('signature', 4),  # Must be PE\0\0
         NumberField('machine', 2).convert(MachineTypes.from_value),
@@ -125,7 +125,7 @@ class COFFHeader(DataBlock):
     ]
 
 
-class PEOptHeader(DataBlock):
+class COFFHeader(DataBlock):
     fields = [
         NumberField('magic', 2).convert(PeFormat.from_value),
         NumberField('major_linker_version', 1),
@@ -190,10 +190,10 @@ class PE32ExtHeader(DataBlock):
         NumberField('checksum', 4),
         NumberField('subsystem', 2),
         NumberField('dll_chars', 2),
-        NumberField('stacke_reserve_size', 8),
-        NumberField('stacke_commit_size', 8),
-        NumberField('heap_reserve_size', 8),
-        NumberField('heap_commit_size', 8),
+        NumberField('stacke_reserve_size', 4),
+        NumberField('stacke_commit_size', 4),
+        NumberField('heap_reserve_size', 4),
+        NumberField('heap_commit_size', 4),
         NumberField('loader_flags', 4),
         NumberField('rva_count', 4),
         ArrayField('data_dir',
@@ -224,15 +224,15 @@ class ExeFormat(DataBlock):
 
         DataBlock(fields=[  # Windows part
             DosExtHeader('dos_header'),
-            COFFHeader('coff_header').set_offset(lambda obj: obj.dos_header.e_lfanew),
+            PEHeader('pe_header').set_offset(lambda obj: obj.dos_header.e_lfanew),
             DataBlock(fields=[
-                PEOptHeader('pe_opt_header'),
-                PE32ExtHeader('pe_opt_header').optional(lambda obj: obj.pe_opt_header.magic == PeFormat.PE32),
-                PE64ExtHeader('pe_opt_header').optional(lambda obj: obj.pe_opt_header.magic == PeFormat.PE64),
-            ]).set_size(lambda obj: obj.coff_header.size_opt),
+                COFFHeader('coff_header'),
+                PE32ExtHeader('opt_header').optional(lambda obj: obj.coff_header.magic == PeFormat.PE32),
+                PE64ExtHeader('opt_header').optional(lambda obj: obj.coff_header.magic == PeFormat.PE64),
+            ]).set_size(lambda obj: obj.pe_header.size_opt),
             ArrayField('sections',
                        element=ImageSection(),
-                       count=lambda obj: obj.coff_header.sections),
+                       count=lambda obj: obj.pe_header.sections),
 
         ]).optional(lambda obj: obj.dos_header.reloc_table_offset >= 64),
 

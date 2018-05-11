@@ -8,7 +8,6 @@
         <file>fileview/AddressList.qml</file>
         <file>fileview/HexList.qml</file>
         <file>fileview/TextList.qml</file>
-        <file>fileview/SectionDrawer.qml</file>
         <file>fileview/CursorRect.qml</file>
         <file>fileview/SelectionArea.qml</file>
         <file>fileview/FileView.qml</file>
@@ -34,6 +33,7 @@
         <file>icons/ic_save_white_24px.svg</file>
         <file>icons/ic_folder_open_white_24px.svg</file>
         <file>fileview/StructureView.qml</file>
-        <file>fileview/SectionDrawer2.qml</file>
+        <file>fileview/SectionDrawer.qml</file>
+        <file>fileview/SectionRect.qml</file>
     </qresource>
 </RCC>
