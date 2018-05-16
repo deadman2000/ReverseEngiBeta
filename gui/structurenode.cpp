@@ -78,3 +78,21 @@ AddressRange * StructureNode::range() const
 {
     return _block->range();
 }
+
+void StructureNode::select()
+{
+    _block->range()->select();
+
+    for (TreeNode* n : _nodes){
+        ((StructureNode*) n)->select();
+    }
+}
+
+void StructureNode::unselect()
+{
+    _block->range()->unselect();
+
+    for (TreeNode* n : _nodes){
+        ((StructureNode*) n)->unselect();
+    }
+}

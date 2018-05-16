@@ -24,6 +24,8 @@ protected:
 public slots:
     virtual void update() override;
     AddressRange *range() const;
+    void select();
+    void unselect();
 
 signals:
     void expandedChanged(bool);

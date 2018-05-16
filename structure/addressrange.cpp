@@ -110,6 +110,18 @@ bool AddressRange::shadow() const
     return _shadow;
 }
 
+void AddressRange::setName(const QString &value)
+{
+    if (_name == value) return;
+    _name = value;
+    emit changed();
+}
+
+const QString &AddressRange::name() const
+{
+    return _name;
+}
+
 bool AddressRange::isBlock() const
 {
     return _isBlock;

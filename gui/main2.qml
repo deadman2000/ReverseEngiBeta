@@ -8,9 +8,4 @@ ApplicationWindow {
     width: 1200
     height: 768
     title: qsTr("Hello World")
-
-    CustomTree {
-        anchors.fill: parent
-        model: G.tree
-    }
 }

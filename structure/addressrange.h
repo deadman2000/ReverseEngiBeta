@@ -14,6 +14,7 @@ class AddressRange : public QObject
     Q_PROPERTY(bool visible READ visible WRITE setVisible NOTIFY changed)
     Q_PROPERTY(bool selected READ selected NOTIFY changed)
     Q_PROPERTY(bool shadow READ shadow WRITE setShadow NOTIFY changed)
+    Q_PROPERTY(QString name READ name NOTIFY changed)
 public:
     explicit AddressRange(QObject *parent = nullptr);
     AddressRange(QObject * parent, int begin, int end);
@@ -43,6 +44,9 @@ public:
     void setShadow(bool value);
     bool shadow() const;
 
+    void setName(const QString & value);
+    const QString & name() const;
+
 signals:
     void changed();
 
@@ -65,6 +69,7 @@ private:
     bool _selected;
     bool _visible;
     bool _shadow;
+    QString _name;
 };
 
 #endif // ADDRESSRANGE_H

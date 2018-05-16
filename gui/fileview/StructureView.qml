@@ -31,7 +31,7 @@ DockPanel {
         id: tree
         anchors.fill: parent
         model: currentFile.structure
-        onSelectedNodeChanged: currentFile.selectRange(selectedNode.range())
+        onSelectedNodeChanged: currentFile.selectRange(selectedNode)
         onDoubleClicked: currentFile.focusRange(selectedNode.range())
     }
 }

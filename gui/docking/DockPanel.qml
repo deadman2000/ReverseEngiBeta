@@ -5,7 +5,7 @@ import QtQuick.Controls.Material 2.2
 DockContainer {
     property alias title: titleLabel.text
     property alias contentItem: content
-    default property alias data: content.data
+    default property alias contentData: content.data
 
     property alias buttons: buttonsRow.children
 

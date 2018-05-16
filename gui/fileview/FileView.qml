@@ -83,7 +83,8 @@ DockPanel {
     {
         if (_selectedRange)
             _selectedRange.unselect()
-        range.select()
+        if (range)
+            range.select()
         _selectedRange = range
     }
 
@@ -121,6 +122,7 @@ DockPanel {
     MouseArea {
         anchors.fill: parent
         acceptedButtons: Qt.LeftButton | Qt.RightButton
+        propagateComposedEvents: true
 
         onWheel: {
             if (wheel.angleDelta.y < 0)

@@ -78,7 +78,7 @@ class Characteristic(IntFlag):
 
 class DosHeader(DataBlock):
     fields = [
-        StringField('signature', 2),
+        StringField('signature', 2).must_be('MZ'),
         NumberField('bytes_in_last_block', 2),
         NumberField('blocks_in_file', 2),
         NumberField('num_relocs', 2),
@@ -233,7 +233,9 @@ class ExeFormat(DataBlock):
             ArrayField('sections',
                        element=ImageSection(),
                        count=lambda obj: obj.pe_header.sections),
-
+            ArrayField('section_data',
+                       element=BytesField(count=lambda obj: obj.sections[obj.__curr_ind].size_of_raw),
+                       count=lambda obj: len(obj.sections))
         ]).optional(lambda obj: obj.dos_header.reloc_table_offset >= 64),
 
         ArrayField('relocs',

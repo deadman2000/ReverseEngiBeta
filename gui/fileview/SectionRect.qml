@@ -16,10 +16,12 @@ Item {
     y: startCell.y * rowHeight
     height: (endCell.y - startCell.y + 1) * rowHeight
 
+    property int _containsMouseCnt: 0
+    readonly property bool containsMouse: _containsMouseCnt > 0
 
     Repeater {
         id: rows
-        model: endCell.y - startCell.y + 1
+        model: endCell.y - startCell.y + 1 // Row count by Y diff
 
         delegate: Rectangle {
             color: section.shadow ? Qt.rgba(0, 0, 0, 0.02) : section.style.color
@@ -36,7 +38,16 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                onReleased: console.log(section)
+                visible: rect.visible && section.visible
+                propagateComposedEvents: true
+                onClicked: {
+                    console.log('clicked', section.name)
+                    mouse.accepted = false
+                }
+
+                hoverEnabled: true
+                onEntered: _containsMouseCnt += 1
+                onExited: _containsMouseCnt -= 1
             }
         }
     }
@@ -118,4 +129,6 @@ Item {
             ctx.stroke();
         }
     }
+
+    readonly property var bindTarget: rows.count > 0 ? rows.itemAt((rows.count-1) / 2) : rect
 }

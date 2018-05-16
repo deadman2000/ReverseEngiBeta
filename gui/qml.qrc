@@ -35,5 +35,6 @@
         <file>fileview/StructureView.qml</file>
         <file>fileview/SectionDrawer.qml</file>
         <file>fileview/SectionRect.qml</file>
+        <file>fileview/SectionLabel.qml</file>
     </qresource>
 </RCC>

@@ -225,6 +225,10 @@ class Element(object):
         self.validator = func
         return self
 
+    def must_be(self, value):
+        self.validator = lambda v, o: v == value
+        return self
+
     # Metainfo
 
     def write_metainfo(self, meta, obj):
@@ -382,14 +386,18 @@ class ArrayField(Element):
         arr = []
         count = get_value(self.count, obj)
         if count is not None:
-            for _ in range(count):
-                e = self.element.read_stream(stream)
+            for i in range(count):
+                obj['__curr_ind'] = i
+                e = self.element.read_stream(stream, obj)
                 arr.append(e)
         else:
+            i = 0
             while True:
+                obj['__curr_ind'] = i
                 try:  # TODO: Best implementation w/o exceptions
                     e = self.element.read_stream(stream)
                     arr.append(e)
+                    i += 1
                 except EOFError:
                     break
 
@@ -401,16 +409,17 @@ class ArrayField(Element):
         i = 0
 
         if count is not None:
-            for _ in range(count):
+            for i in range(count):
+                obj['__curr_ind'] = i
                 elname = self.name + '[' + str(i) + ']'
                 e, pos, size = self._read_element_meta(stream, obj)
                 elements[elname] = e
                 elements['$' + elname] = {'offset': pos, 'size': size}
-                i += 1
         else:
             while True:
+                obj['__curr_ind'] = i
+                elname = self.name + '[' + str(i) + ']'
                 try:  # TODO: Best implementation w/o exceptions
-                    elname = self.name + '[' + str(i) + ']'
                     e, pos, size = self._read_element_meta(stream, obj)
                     elements[elname] = e
                     elements['$' + elname] = {'offset': pos, 'size': size}
@@ -422,7 +431,7 @@ class ArrayField(Element):
 
     def _read_element_meta(self, stream, obj):
         pos = stream.tell()
-        e = self.element.read_stream(stream)
+        e = self.element.read_stream(stream, obj)
         size = stream.tell() - pos
         return e, pos, size
 

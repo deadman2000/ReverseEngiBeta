@@ -12,9 +12,8 @@ def encode_datetime(v):
     return v
 
 
-#path = "c:/Windows/explorer.exe"
+path = "c:/Windows/explorer.exe"
 #path = "D:/Dos/GAMES/AGE/intro.exe"
-path = "D:/Programs/S&M.exe"
 fmt = ExeFormat()
 obj = fmt.parse_file(path, to_meta=True, compact_meta=True)  # to_meta=True, compact_meta=True
 #pprint(obj['pe_opt_header']['value']['data_dir']['value'])

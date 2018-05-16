@@ -133,6 +133,7 @@ const QString &Block::name() const
 void Block::setName(const QString &name)
 {
     _name = name;
+    _range.setName(name);
 }
 
 void Block::setDescription(const QString &description)
