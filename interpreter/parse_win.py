@@ -15,8 +15,7 @@ def encode_datetime(v):
 path = "c:/Windows/explorer.exe"
 #path = "D:/Dos/GAMES/AGE/intro.exe"
 fmt = ExeFormat()
-obj = fmt.parse_file(path, to_meta=True, compact_meta=True)  # to_meta=True, compact_meta=True
-#pprint(obj['pe_opt_header']['value']['data_dir']['value'])
+obj = fmt.parse_file(path, to_meta=True, compact_meta=False)
 pprint(obj)
 
 # http://sugendran.github.io/msgpack-visualizer/

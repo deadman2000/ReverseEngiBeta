@@ -1,5 +1,5 @@
 from enum import IntFlag
-from structure import DataBlock, NumberField, ByteOrder, EEnum, ArrayField, BytesField, StringField
+from structure import DataBlock, NumberField, ByteOrder, EEnum, ArrayField, BytesField, StringField, IfField, CaseField
 import datetime
 
 
@@ -147,9 +147,9 @@ class DataDirectory(DataBlock):
 
 class PE64ExtHeader(DataBlock):
     fields = [
-        NumberField('image_base', 8).convert(hex),
-        NumberField('section_alignment', 4).convert(hex),
-        NumberField('file_alignment', 4).convert(hex),
+        NumberField('image_base', 8),
+        NumberField('section_alignment', 4),
+        NumberField('file_alignment', 4),
         NumberField('major_os_ver', 2),
         NumberField('minor_os_ver', 2),
         NumberField('major_image_ver', 2),
@@ -168,15 +168,13 @@ class PE64ExtHeader(DataBlock):
         NumberField('heap_commit_size', 8),
         NumberField('loader_flags', 4),
         NumberField('rva_count', 4),
-        ArrayField('data_dir',
-                   element=DataDirectory(),
-                   count=lambda obj: obj.rva_count),
+        ArrayField('data_dir', DataDirectory(), lambda obj: obj.rva_count),
     ]
 
 
 class PE32ExtHeader(DataBlock):
     fields = [
-        NumberField('base_of_data', 4).convert(hex),
+        NumberField('base_of_data', 4),
         NumberField('image_base', 4),
         NumberField('section_alignment', 4),
         NumberField('file_alignment', 4),
@@ -196,9 +194,7 @@ class PE32ExtHeader(DataBlock):
         NumberField('heap_commit_size', 4),
         NumberField('loader_flags', 4),
         NumberField('rva_count', 4),
-        ArrayField('data_dir',
-                   element=DataDirectory(),
-                   count=lambda obj: obj.rva_count),
+        ArrayField('data_dir', DataDirectory(), lambda obj: obj.rva_count),
     ]
 
 
@@ -207,13 +203,16 @@ class ImageSection(DataBlock):
         StringField('name', 8),
         NumberField('misc', 4),
         NumberField('virtual_addr', 4).convert(hex),
-        NumberField('size_of_raw', 4).convert(hex),
-        NumberField('pointer_to_raw', 4).convert(hex),
+        NumberField('size_of_raw', 4),
+        NumberField('pointer_to_raw', 4),
         NumberField('pointer_to_reloc', 4),
         NumberField('pointer_to_linenum', 4),
         NumberField('num_reloc', 2),
         NumberField('num_linemnum', 2),
         NumberField('characts', 4),
+        BytesField('data', lambda obj: obj.size_of_raw)
+            .set_offset(lambda obj: obj.pointer_to_raw, return_pos=True)
+            .convert(lambda v: '')
     ]
 
 
@@ -227,18 +226,14 @@ class ExeFormat(DataBlock):
             PEHeader('pe_header').set_offset(lambda obj: obj.dos_header.e_lfanew),
             DataBlock(fields=[
                 COFFHeader('coff_header'),
-                PE32ExtHeader('opt_header').optional(lambda obj: obj.coff_header.magic == PeFormat.PE32),
-                PE64ExtHeader('opt_header').optional(lambda obj: obj.coff_header.magic == PeFormat.PE64),
+                CaseField('opt_header', lambda obj: obj.coff_header.magic, (
+                              (PeFormat.PE32, PE32ExtHeader()),
+                              (PeFormat.PE64, PE64ExtHeader())
+                          ))
             ]).set_size(lambda obj: obj.pe_header.size_opt),
-            ArrayField('sections',
-                       element=ImageSection(),
-                       count=lambda obj: obj.pe_header.sections),
-            ArrayField('section_data',
-                       element=BytesField(count=lambda obj: obj.sections[obj.__curr_ind].size_of_raw),
-                       count=lambda obj: len(obj.sections))
+            ArrayField('sections', ImageSection(), lambda obj: obj.pe_header.sections),
         ]).optional(lambda obj: obj.dos_header.reloc_table_offset >= 64),
 
-        ArrayField('relocs',
-                   element=ExeReloc(),
-                   count=lambda obj: obj.dos_header.num_relocs).set_offset(lambda obj: obj.dos_header.reloc_table_offset),
+        ArrayField('relocs', ExeReloc(), lambda obj: obj.dos_header.num_relocs)
+            .set_offset(lambda obj: obj.dos_header.reloc_table_offset),
     ]

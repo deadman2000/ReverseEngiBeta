@@ -1,4 +1,3 @@
-import pprint
 import unittest
 from ipaddress import IPv4Address
 from formats.net import *
@@ -7,7 +6,7 @@ ETH_IP_TCP_DATA = b'\x00\x07\xb4\x00M\x01T\x04\xa6`\xdc^\x08\x00E\x00\x00l-\xd3@
 ETH_IP_UDP_DATA = b'\x01\x00^\x7f\xff\xfa\x00PV\xc0\x00\x08\x08\x00E\x00\x00\xca1\xa2\x00\x00\x01\x117\xdd\xc0\xa8\x9f\x01\xef\xff\xff\xfa\xe2R\x07l\x00\xb6\xc2dM-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\nMAN: "ssdp:discover"\r\nMX: 1\r\nST: urn:dial-multiscreen-org:service:dial:1\r\nUSER-AGENT: Google Chrome/66.0.3359.139 Windows\r\n\r\n'
 
 
-class TestStringMethods(unittest.TestCase):
+class TestPraserMethods(unittest.TestCase):
     maxDiff = None
 
     def test_bits_le(self):
@@ -67,6 +66,67 @@ class TestStringMethods(unittest.TestCase):
             NumberField('e', 1).optional(lambda o: o.c == 48)
         ]).parse_bytes(b'\x01\x02\x03')
         self.assertDictEqual(obj, {'a': 1, 'c': 2, 'd': 3})
+
+    def test_if(self):
+        obj = DataBlock(fields=[
+            NumberField('a', 1),
+            IfField('b', (
+                (lambda o: o.a == 1, StringField(count=2)),
+                (lambda o: o.a == 2, NumberField(bytes_count=1))
+            )),
+            NumberField('c', 1)
+        ]).parse_bytes(b'\x01\x31\x32\x02')
+        self.assertDictEqual(obj, {'a': 1, 'b': '12', 'c': 2})
+
+        obj = DataBlock(fields=[
+            NumberField('a', 1),
+            IfField('b', (
+                (lambda o: o.a == 2, NumberField(bytes_count=1)),
+                (lambda o: o.a == 1, DataBlock(fields=[
+                    StringField('sa', 1),
+                    StringField('sb', 1)
+                ]))
+            )),
+            NumberField('c', 1)
+        ]).parse_bytes(b'\x01\x31\x32\x02')
+        self.assertDictEqual(obj, {'a': 1, 'b': {'sa': '1', 'sb': '2'}, 'c': 2})
+
+    def test_case(self):
+        obj = DataBlock(fields=[
+            NumberField('a', 1),
+            CaseField('b', lambda o: o.a, (
+                (1, StringField(count=2)),
+                (2, NumberField(bytes_count=1))
+            )),
+            NumberField('c', 1)
+        ]).parse_bytes(b'\x01\x31\x32\x02')
+        self.assertDictEqual(obj, {'a': 1, 'b': '12', 'c': 2})
+
+        obj = DataBlock(fields=[
+            NumberField('a', 1),
+            CaseField('b', lambda o: o.a, (
+                (2, NumberField(bytes_count=1)),
+                (1, DataBlock(fields=[
+                    StringField('sa', 1),
+                    StringField('sb', 1)
+                ]))
+            )),
+            NumberField('c', 1)
+        ]).parse_bytes(b'\x01\x31\x32\x02')
+        self.assertDictEqual(obj, {'a': 1, 'b': {'sa': '1', 'sb': '2'}, 'c': 2})
+
+        obj = DataBlock(fields=[
+            NumberField('a', 1),
+            CaseField('b', lambda o: o.a, (
+                (2, NumberField(bytes_count=1)),
+                (3, DataBlock(fields=[
+                    StringField('sa', 1),
+                    StringField('sb', 1)
+                ]))
+            ), StringField(count=2)),
+            NumberField('c', 1)
+        ]).parse_bytes(b'\x01\x31\x32\x02')
+        self.assertDictEqual(obj, {'a': 1, 'b': '12', 'c': 2})
 
     def test_eth_ip_tcp(self):
         ethernet = EthernetFormat()
@@ -141,6 +201,12 @@ class TestStringMethods(unittest.TestCase):
                    }
         # pprint.pprint(result)
         self.assertDictEqual(result, example)
+
+    def test_model_validation(self):
+        with self.assertRaises(FormatError):
+            IfField(selector=(
+                (lambda o: True, NumberField(bytes_count=1)),
+            ))
 
 
 if __name__ == '__main__':

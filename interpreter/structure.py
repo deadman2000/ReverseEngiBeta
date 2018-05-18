@@ -36,15 +36,26 @@ class StreamWrapper:
 
 
 class AttrDict(dict):
-    def __init__(self, *args, **kwargs):
-        super(AttrDict, self).__init__(*args, **kwargs)
+    def __init__(self, parent=None):
+        super(AttrDict, self).__init__()
         self.__dict__ = self
+        self.__parent__ = parent
 
 
 def get_value(value, obj):
     if hasattr(value, '__call__'):  # it's lambda or method
         return value(obj)
     return value
+
+
+def clean_obj(obj):
+    if isinstance(obj, AttrDict):
+        obj.pop('__parent__', None)
+        for key, val in obj.items():
+            clean_obj(val)
+    elif isinstance(obj, list):
+        for val in obj:
+            clean_obj(val)
 
 
 def reorganize_meta(obj):
@@ -54,14 +65,25 @@ def reorganize_meta(obj):
             continue
 
         m = obj['$' + key]
-        if m['size'] == 0:
+        if m['size'] <= 0:
+            assert (m['size'] == 0)
             continue
-
-        assert (m['size'] > 0)
 
         if isinstance(val, dict):
             val = reorganize_meta(val)
-        assert (not isinstance(val, list))
+        elif isinstance(val, list):
+            arr_dict = {}
+            for i in range(len(val)):
+                elmeta = obj['$' + key + '[' + str(i) + ']']
+                elval = val[i]
+                if isinstance(elval, dict):
+                    elval = reorganize_meta(elval)
+
+                arr_dict[key + '[' + str(i) + ']'] = {
+                    **elmeta,
+                    'value': elval
+                }
+            val = arr_dict
 
         m['value'] = val
 
@@ -83,7 +105,21 @@ def reorganize_meta_compact(obj):
 
         if isinstance(val, dict):
             val = reorganize_meta_compact(val)
-        assert (not isinstance(val, list))
+        elif isinstance(val, list):
+            arr_dict = {}
+            for i in range(len(val)):
+                elmeta = obj['$' + key + '[' + str(i) + ']']
+                elval = val[i]
+                if isinstance(elval, dict):
+                    elval = reorganize_meta_compact(elval)
+
+                arr_dict[key + '[' + str(i) + ']'] = [
+                    elmeta['offset'],
+                    elmeta['size'],
+                    0,
+                    elval
+                ]
+            val = arr_dict
 
         result[key] = [
             m['offset'],
@@ -99,10 +135,15 @@ class ValidationError(Exception):
     pass
 
 
+class FormatError(Exception):
+    pass
+
+
 class Element(object):
     byteorder = None
     size = None
     offset = None
+    return_pos = None
     func_opt = None
     converters = None
     with_meta = None
@@ -114,17 +155,21 @@ class Element(object):
         self.validator = None
 
     def read_value(self, stream, obj):
+        # Считывает поток в объект obj
         raise NotImplementedError()
 
     # Parsing
 
-    def read_stream(self, stream, obj=None):
+    def read_stream(self, stream, obj=None, parent=None):
         if self.func_opt is not None:
             if not get_value(self.func_opt, obj):
                 return obj
 
         if obj is None:
-            obj = AttrDict()
+            obj = AttrDict(parent)
+
+        if self.return_pos:
+            old_pos = stream.tell()
 
         if self.offset is not None:
             offset = get_value(self.offset, obj)
@@ -140,6 +185,9 @@ class Element(object):
         val = self.read_value(stream, obj)
 
         size = stream.tell() - pos
+
+        if self.return_pos:
+            stream.seek(old_pos)
 
         if self.converters is not None:
             for c in self.converters:
@@ -169,7 +217,8 @@ class Element(object):
 
     def parse_stream(self, stream, to_meta=False, compact_meta=False):
         self.with_meta = to_meta
-        obj = self.read_stream(StreamWrapper(stream), None)
+        obj = self.read_stream(StreamWrapper(stream))
+        clean_obj(obj)
         if to_meta:
             if compact_meta:
                 return reorganize_meta_compact(obj)
@@ -201,8 +250,9 @@ class Element(object):
         self.converters.append(func)
         return self
 
-    def set_offset(self, func_val):  # TODO Relative current pos. offset
+    def set_offset(self, func_val, return_pos=False):  # TODO Relative current pos. offset
         self.offset = func_val
+        self.return_pos = return_pos
         return self
 
     def optional(self, func_opt):
@@ -275,11 +325,12 @@ class NumberField(Element):
 
 class ObjectElement(Element):
     def read_value(self, stream, obj):
+        assert(obj is not None)
         if self.name:  # If name is set, this block must be field id obj, else is parsed into obj
             if hasattr(obj, self.name):  # Field already exists. exetend it!
                 obj = obj[self.name]
             else:
-                d = AttrDict()
+                d = AttrDict(obj)
                 obj[self.name] = d
                 obj = d
         self.read_fields(stream, obj)
@@ -387,51 +438,53 @@ class ArrayField(Element):
         count = get_value(self.count, obj)
         if count is not None:
             for i in range(count):
-                obj['__curr_ind'] = i
-                e = self.element.read_stream(stream, obj)
+                obj['__curr_ind__'] = i
+                e = self.element.read_stream(stream, None, obj)
                 arr.append(e)
         else:
             i = 0
             while True:
-                obj['__curr_ind'] = i
+                obj['__curr_ind__'] = i
                 try:  # TODO: Best implementation w/o exceptions
-                    e = self.element.read_stream(stream)
+                    e = self.element.read_stream(stream, None, obj)
                     arr.append(e)
                     i += 1
                 except EOFError:
                     break
 
+        obj.pop('__curr_ind__', None)
         return arr
 
     def _read_value_meta(self, stream, obj):
         count = get_value(self.count, obj)
-        elements = {}
         i = 0
 
+        arr = []
         if count is not None:
             for i in range(count):
-                obj['__curr_ind'] = i
+                obj['__curr_ind__'] = i
                 elname = self.name + '[' + str(i) + ']'
                 e, pos, size = self._read_element_meta(stream, obj)
-                elements[elname] = e
-                elements['$' + elname] = {'offset': pos, 'size': size}
+                arr.append(e)
+                obj['$' + elname] = {'offset': pos, 'size': size}
         else:
-            while True:
-                obj['__curr_ind'] = i
-                elname = self.name + '[' + str(i) + ']'
-                try:  # TODO: Best implementation w/o exceptions
+            try:  # TODO: Best implementation w/o exceptions
+                while True:
+                    obj['__curr_ind__'] = i
+                    elname = self.name + '[' + str(i) + ']'
                     e, pos, size = self._read_element_meta(stream, obj)
-                    elements[elname] = e
-                    elements['$' + elname] = {'offset': pos, 'size': size}
+                    arr.append(e)
+                    obj['$' + elname] = {'offset': pos, 'size': size}
                     i += 1
-                except EOFError:
-                    break
+            except EOFError:
+                pass
 
-        return elements
+        obj.pop('__curr_ind__', None)
+        return arr
 
     def _read_element_meta(self, stream, obj):
         pos = stream.tell()
-        e = self.element.read_stream(stream, obj)
+        e = self.element.read_stream(stream, None, obj)
         size = stream.tell() - pos
         return e, pos, size
 
@@ -471,6 +524,57 @@ class DataBlock(ObjectElement):
         if byteorder is not None:
             self.byteorder = byteorder
 
-    def read_fields(self, stream, obj=None):
+    def read_fields(self, stream, obj):
         for e in self.fields:
             e.read_stream(stream, obj)
+
+
+class MultipleField(Element):
+    def _assign_child(self, el):
+        if el.name is None:
+            if self.name:
+                el.name = self.name
+            else:
+                raise FormatError('Parent or child must have name')
+        el.parent = self
+
+    def read_stream(self, stream, obj=None, parent=None):
+        raise NotImplementedError()
+
+    def read_value(self, stream, obj):
+        pass
+
+
+class IfField(MultipleField):
+    def __init__(self, name=None, selector=None):
+        super().__init__(name)
+        self.selector = selector
+        for expr, el in self.selector:
+            self._assign_child(el)
+
+    def read_stream(self, stream, obj=None, parent=None):
+        for expr, el in self.selector:
+            if get_value(expr, obj):
+                return el.read_stream(stream, obj, parent)
+        return obj
+
+
+class CaseField(MultipleField):
+    def __init__(self, name=None, expr=None, selector=None, default=None):
+        super().__init__(name)
+        self.expression = expr
+        self.selector = selector
+        self.default = default
+        for val, el in self.selector:
+            self._assign_child(el)
+        if default:
+            self._assign_child(default)
+
+    def read_stream(self, stream, obj=None, parent=None):
+        v = get_value(self.expression, obj)
+        for val, el in self.selector:
+            if val == v:
+                return el.read_stream(stream, obj)
+        if self.default:
+            return self.default.read_stream(stream, obj, parent)
+        return obj

@@ -19,42 +19,89 @@ Item {
     property int _containsMouseCnt: 0
     readonly property bool containsMouse: _containsMouseCnt > 0
 
-    Repeater {
-        id: rows
-        model: endCell.y - startCell.y + 1 // Row count by Y diff
+    Rectangle {
+        id: topRow
+        color: section.shadow ? Qt.rgba(0, 0, 0, 0.02) : section.style.color
+        Behavior on color { ColorAnimation { duration: 100 } }
 
-        delegate: Rectangle {
-            color: section.shadow ? Qt.rgba(0, 0, 0, 0.02) : section.style.color
-            Behavior on color { ColorAnimation { duration: 100 } }
+        x: startCell.x * cellWidth
+        y: 0
+        width: endCell.y === startCell.y ? cellWidth * (endCell.x - startCell.x + 1) // One line
+                                         : (16 - startCell.x) * cellWidth // First line
 
-            x: modelData == 0 ? startCell.x * cellWidth : 0
-            width: endCell.y === startCell.y ? cellWidth * (endCell.x - startCell.x + 1) // One line
-                                             : modelData == 0 ? (16 - startCell.x) * cellWidth // First line
-                                                              : modelData === endCell.y - startCell.y ? (endCell.x + 1) * cellWidth // Last line
-                                                                                                      : 16 * cellWidth   // Middle line
+        height: rowHeight
 
-            y: modelData * rowHeight
-            height: rowHeight
-
-            MouseArea {
-                anchors.fill: parent
-                visible: rect.visible && section.visible
-                propagateComposedEvents: true
-                onClicked: {
-                    console.log('clicked', section.name)
-                    mouse.accepted = false
-                }
-
-                hoverEnabled: true
-                onEntered: _containsMouseCnt += 1
-                onExited: _containsMouseCnt -= 1
+        MouseArea {
+            anchors.fill: parent
+            visible: rect.visible && section.visible
+            propagateComposedEvents: true
+            onClicked: {
+                console.log('clicked', section.name)
+                mouse.accepted = false
             }
+
+            hoverEnabled: true
+            onEntered: _containsMouseCnt += 1
+            onExited: _containsMouseCnt -= 1
+        }
+    }
+
+    Rectangle {
+        id: middleRow
+        color: section.shadow ? Qt.rgba(0, 0, 0, 0.02) : section.style.color
+        Behavior on color { ColorAnimation { duration: 100 } }
+
+        visible: endCell.y - startCell.y > 1
+        x: 0
+        y: rowHeight
+        width: 16 * cellWidth
+        height: (endCell.y - startCell.y - 1) * rowHeight
+
+        MouseArea {
+            anchors.fill: parent
+            visible: rect.visible && section.visible
+            propagateComposedEvents: true
+            onClicked: {
+                console.log('clicked', section.name)
+                mouse.accepted = false
+            }
+
+            hoverEnabled: true
+            onEntered: _containsMouseCnt += 1
+            onExited: _containsMouseCnt -= 1
+        }
+    }
+
+    Rectangle {
+        id: bottomRow
+        color: section.shadow ? Qt.rgba(0, 0, 0, 0.02) : section.style.color
+        Behavior on color { ColorAnimation { duration: 100 } }
+
+        visible: endCell.y !== startCell.y
+        x: 0
+        y: (endCell.y - startCell.y) * rowHeight
+        width: (endCell.x + 1) * cellWidth
+        height: rowHeight
+
+        MouseArea {
+            anchors.fill: parent
+            visible: rect.visible && section.visible
+            propagateComposedEvents: true
+            onClicked: {
+                console.log('clicked', section.name)
+                mouse.accepted = false
+            }
+
+            hoverEnabled: true
+            onEntered: _containsMouseCnt += 1
+            onExited: _containsMouseCnt -= 1
         }
     }
 
     Canvas { // Отрисовка границы секции
         id: canvas
         anchors.fill: parent
+        visible: false
 
         Connections {
             target: section
@@ -68,6 +115,7 @@ Item {
         onPaint: {
             var ctx = getContext("2d");
             ctx.reset()
+            ctx.resetTransform()
 
             var bw = section.selected ? 2 : borderWidth
 
@@ -76,12 +124,10 @@ Item {
             ctx.strokeStyle = canvas.color
             ctx.lineWidth = bw
 
-            ctx.resetTransform();
-
             var start = startCell
             var end = endCell
-            var firstRect = rows.itemAt(0)
-            var lastRect = rows.itemAt(rows.model - 1)
+            var firstRect = topRow
+            var lastRect = bottomRow
 
             ctx.beginPath()
 
@@ -130,5 +176,5 @@ Item {
         }
     }
 
-    readonly property var bindTarget: rows.count > 0 ? rows.itemAt((rows.count-1) / 2) : rect
+    readonly property var bindTarget: middleRow.visible ? middleRow : topRow
 }

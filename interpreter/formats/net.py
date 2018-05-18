@@ -43,23 +43,6 @@ class IPProtocol(EEnum):
 
 
 # https://ru.bmstu.wiki/IPv4_(Internet_Protocol_version_4)
-class IPDataField(Element):
-    def __init__(self):
-        super().__init__()
-        self.tcp = TCPFormat()
-        self.udp = UDPFormat()
-
-    def read_value(self, stream, obj):
-        size = obj.size - obj.header_size * 4
-        data = stream.read(size)
-        if obj.protocol == IPProtocol.TCP:
-            obj['tcp'] = self.tcp.parse_bytes(data)
-        elif obj.protocol == IPProtocol.UDP:
-            obj['udp'] = self.udp.parse_bytes(data)
-        else:
-            obj['other'] = data
-
-
 class IPAddr(NumberField):
     def __init__(self, name):
         super().__init__(name, 4)
@@ -87,7 +70,13 @@ class IPFormat(DataBlock):
         IPAddr('source'),
         IPAddr('dest'),
         BytesField('options', lambda p: (p.header_size - 5) * 4).convert(bytes.hex),
-        IPDataField()
+        CaseField(expr=lambda obj: obj.protocol,
+                  selector=(
+                      (IPProtocol.TCP, TCPFormat('tcp')),
+                      (IPProtocol.UDP, UDPFormat('udp'))
+                  ),
+                  default=BytesField('other')
+        ).set_size(lambda o: o.size - o.header_size * 4)
     ]
 
 
@@ -96,13 +85,6 @@ class EthernetDataType(EEnum):
     IPv4 = 0x800
     ARP = 0x806
     IPv6 = 0x86DD
-
-
-class EthernetDataField(DataBlock):
-    fields=[
-        IPFormat('ip').optional(lambda obj: obj.type == EthernetDataType.IPv4),
-        BytesField('other').optional(lambda obj: obj.type != EthernetDataType.IPv4),
-    ]
 
 
 class MacAddressField(BytesField):
@@ -117,6 +99,11 @@ class EthernetFormat(DataBlock):
         MacAddressField('dest'),
         MacAddressField('source'),
         NumberField('type', 2).convert(EthernetDataType.from_value),
-        EthernetDataField(),
+        CaseField(expr=lambda obj: obj.type,
+                  selector=(
+                      (EthernetDataType.IPv4, IPFormat('ip')),
+                  ),
+                  default=BytesField('other')
+        ),
         BytesField('padding')
     ]
