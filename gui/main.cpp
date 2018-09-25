@@ -3,6 +3,7 @@
 #include <QQmlContext>
 #include <QFontDatabase>
 #include <QQuickStyle>
+#include <QDirIterator>
 
 #include "filedocument.h"
 #include "filemodel.h"
@@ -18,10 +19,10 @@ int main(int argc, char *argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
 
-    QFontDatabase fontDatabase;
-    fontDatabase.addApplicationFont(":/fonts/CamingoCode.ttf");
-    fontDatabase.addApplicationFont(":/fonts/Roboto-Regular.ttf");
-    fontDatabase.addApplicationFont(":/fonts/Roboto-Medium.ttf");
+    QDirIterator it(":/fonts/", QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        QFontDatabase::addApplicationFont(it.next());
+    }
 
     QFont font("Roboto");
     app.setFont(font);

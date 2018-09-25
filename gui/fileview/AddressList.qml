@@ -30,7 +30,7 @@ Rectangle {
         delegate:
             HexText {
                 text: address
-                height: rowHeight
+                height: G.rowHeight
                 color: Qt.rgba(0,0,0,0.54)
 
                 property int rowIndex: index

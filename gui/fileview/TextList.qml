@@ -10,7 +10,7 @@ Item {
     function symPos(coord)
     {
         return Qt.point(Math.round(coord.x * symWidth),
-                        Math.round(coord.y * rowHeight - list.contentY))
+                        Math.round(coord.y * G.rowHeight - list.contentY))
     }
 
     function symAt(point)  // Символ по координатам
@@ -46,7 +46,7 @@ Item {
         delegate:
             HexText {
                 text: fileText
-                height: rowHeight
+                height: G.rowHeight
 
                 property int rowIndex: index
             }

@@ -10,7 +10,7 @@ Rectangle {
     onPosChanged: cursorAnimation.restart()
 
     x: pos.x
-    y: pos.y + 1 + rowHeight - height - 1 - 2
+    y: pos.y + 1 + G.rowHeight - height - 1 - 2
 
     SequentialAnimation on color {
         id: cursorAnimation

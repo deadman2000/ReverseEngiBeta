@@ -4,6 +4,13 @@
         <file>qtquickcontrols2.conf</file>
         <file>CustomTable.qml</file>
         <file>fonts/CamingoCode.ttf</file>
+        <file>fonts/Hack-Regular.ttf</file>
+        <file>fonts/3270Medium.ttf</file>
+        <file>fonts/Anonymous Pro.ttf</file>
+        <file>fonts/Menlo-Regular.ttf</file>
+        <file>fonts/monaco.ttf</file>
+        <file>fonts/SourceCodeVariable-Roman.ttf</file>
+        <file>fonts/SpaceMono-Regular.ttf</file>
         <file>fileview/HexText.qml</file>
         <file>fileview/AddressList.qml</file>
         <file>fileview/HexList.qml</file>
@@ -36,5 +43,7 @@
         <file>fileview/SectionDrawer.qml</file>
         <file>fileview/SectionRect.qml</file>
         <file>fileview/SectionLabel.qml</file>
+        <file>fonts/DejaVuSansMono.ttf</file>
+        <file>fonts/DroidSansMono.ttf</file>
     </qresource>
 </RCC>

@@ -13,8 +13,8 @@ Item {
     Behavior on opacity { NumberAnimation { duration: 100 } }
 
     width: parent.width
-    y: startCell.y * rowHeight
-    height: (endCell.y - startCell.y + 1) * rowHeight
+    y: startCell.y * G.rowHeight
+    height: (endCell.y - startCell.y + 1) * G.rowHeight
 
     property int _containsMouseCnt: 0
     readonly property bool containsMouse: _containsMouseCnt > 0
@@ -29,7 +29,7 @@ Item {
         width: endCell.y === startCell.y ? cellWidth * (endCell.x - startCell.x + 1) // One line
                                          : (16 - startCell.x) * cellWidth // First line
 
-        height: rowHeight
+        height: G.rowHeight
 
         MouseArea {
             anchors.fill: parent
@@ -53,9 +53,9 @@ Item {
 
         visible: endCell.y - startCell.y > 1
         x: 0
-        y: rowHeight
+        y: G.rowHeight
         width: 16 * cellWidth
-        height: (endCell.y - startCell.y - 1) * rowHeight
+        height: (endCell.y - startCell.y - 1) * G.rowHeight
 
         MouseArea {
             anchors.fill: parent
@@ -79,9 +79,9 @@ Item {
 
         visible: endCell.y !== startCell.y
         x: 0
-        y: (endCell.y - startCell.y) * rowHeight
+        y: (endCell.y - startCell.y) * G.rowHeight
         width: (endCell.x + 1) * cellWidth
-        height: rowHeight
+        height: G.rowHeight
 
         MouseArea {
             anchors.fill: parent

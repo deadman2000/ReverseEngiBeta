@@ -12,7 +12,7 @@ Item {
     function symPos(coord)  // Координаты символа
     {
         return Qt.point(Math.round(coord.x * (G.hexLetter.width*3) + textPadding),
-                        Math.round(coord.y * rowHeight - contentY))
+                        Math.round(coord.y * G.rowHeight - contentY))
     }
 
     function symAt(point)  // Символ по координатам
@@ -47,7 +47,7 @@ Item {
         delegate:
             HexText {
                 text: hex
-                height: rowHeight
+                height: G.rowHeight
                 leftPadding: textPadding
                 rightPadding: textPadding
 

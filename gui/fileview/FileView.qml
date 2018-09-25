@@ -42,10 +42,10 @@ DockPanel {
 
     property int topRow: 0
 
-    property int listContentY: topRow * rowHeight - listTopPadding
+    property int listContentY: topRow * G.rowHeight - listTopPadding
     readonly property real scrollPosition: topRow / (fileModel.rows - rowsInScreen)
 
-    readonly property int rowsInScreen: contentItem.height / rowHeight
+    readonly property int rowsInScreen: contentItem.height / G.rowHeight
 
 
     function setScroll(value) {

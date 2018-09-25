@@ -3,7 +3,6 @@ import QtQuick.Controls.Material 2.2
 
 Text {
     color: Material.foreground
-    font.pixelSize: 16
-    font.family: "CamingoCode"
+    font: G.mainFont
     verticalAlignment: Text.AlignVCenter
 }

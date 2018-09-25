@@ -5,8 +5,12 @@
 
 #include "treenode.h"
 
-QmlGlobal::QmlGlobal() : QObject(nullptr)
+QmlGlobal::QmlGlobal()
+    : QObject(nullptr)
 {
+    _rowHeight = 32;
+    _mainFont = QFont("Hack");
+    _mainFont.setPixelSize(16);
     updateFontSize();
 
     _tree = new TreeNode(nullptr);
@@ -40,9 +44,8 @@ QObject *QmlGlobal::createStructure(FileDocument * file) const
 
 void QmlGlobal::updateFontSize()
 {
-    QFont codeFont("CamingoCode");
-    codeFont.setPixelSize(16);
     QString str(" ");
-    QFontMetrics fm(codeFont);
+    QFontMetrics fm(_mainFont);
     _hexLetter = fm.size(0, str);
+    qDebug() << "LETTER SIZE:" << _hexLetter;
 }

@@ -12,7 +12,6 @@ ApplicationWindow {
     height: 768
     title: qsTr("Hello World")
 
-    property int rowHeight: 32
     property int listTopPadding: 8
 
     function addressToPoint(address) {
