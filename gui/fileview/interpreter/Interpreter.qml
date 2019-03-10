@@ -1,4 +1,4 @@
-import QtQuick 2.7
+import QtQuick 2.12
 import QtQuick.Window 2.3
 import QtQuick.Controls 1.4
 import ReverseEngi 1.0

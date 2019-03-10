@@ -83,8 +83,8 @@ Sector *read_structure(QString &filePath)
     qDebug() << "Load" << filePath;
 
     QProcess process;
-    //process.start("python", {"D:\\Projects\\ReverseEngi\\ReverseEngiBeta\\interpreter\\parse_to_msgpack.py", "--in", filePath});
-    process.start("python3", {"e:\\Projects\\ReverseEngiBeta\\interpreter\\parse_to_msgpack.py", "--in", filePath});
+    process.start("python", {"D:\\Projects\\ReverseEngi\\ReverseEngiBeta\\interpreter\\parse_to_msgpack.py", "--in", filePath});
+    //process.start("python3", {"e:\\Projects\\ReverseEngiBeta\\interpreter\\parse_to_msgpack.py", "--in", filePath});
     if (!process.waitForFinished())
     {
         qDebug() << process.errorString();

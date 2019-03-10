@@ -1,4 +1,4 @@
-import QtQuick 2.7
+import QtQuick 2.12
 
 Item {
     id: rect
@@ -36,7 +36,7 @@ Item {
             visible: rect.visible && section.visible
             propagateComposedEvents: true
             onClicked: {
-                console.log('clicked', section.name)
+                console.log('clicked1', section.name)
                 mouse.accepted = false
             }
 
@@ -62,7 +62,7 @@ Item {
             visible: rect.visible && section.visible
             propagateComposedEvents: true
             onClicked: {
-                console.log('clicked', section.name)
+                console.log('clicked2', section.name)
                 mouse.accepted = false
             }
 
@@ -88,7 +88,7 @@ Item {
             visible: rect.visible && section.visible
             propagateComposedEvents: true
             onClicked: {
-                console.log('clicked', section.name)
+                console.log('clicked3', section.name)
                 mouse.accepted = false
             }
 
@@ -101,7 +101,7 @@ Item {
     Canvas { // Отрисовка границы секции
         id: canvas
         anchors.fill: parent
-        visible: false
+        visible: true
 
         Connections {
             target: section
@@ -113,6 +113,11 @@ Item {
         onColorChanged: canvas.requestPaint()
 
         onPaint: {
+            if (canvas.height > 200) {
+                console.log('Height:', canvas.height);
+                console.log(section.name);
+                return;
+            }
             var ctx = getContext("2d");
             ctx.reset()
             ctx.resetTransform()

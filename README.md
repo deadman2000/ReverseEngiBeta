@@ -45,4 +45,6 @@
 	
 # Алтренативы
 
+https://www.synalysis.net/
+
 https://marcin-chwedczuk.github.io/a-closer-look-at-portable-executable-msdos-stub

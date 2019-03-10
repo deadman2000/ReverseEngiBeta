@@ -24,16 +24,7 @@
         <file>icons/ic_add_white_24px.svg</file>
         <file>icons/ic_arrow_drop_down_black_24px.svg</file>
         <file>docking/DockButton.qml</file>
-        <file>style/ToolButton.qml</file>
-        <file>style/Menu.qml</file>
-        <file>style/MenuItem.qml</file>
-        <file>style/Button.qml</file>
-        <file>style/ToolBar.qml</file>
-        <file>style/Dialog.qml</file>
-        <file>style/ComboBox.qml</file>
         <file>fileview/interpreter/Interpreter.qml</file>
-        <file>MainMenu.qml</file>
-        <file>MainMenuItem.qml</file>
         <file>CustomTree.qml</file>
         <file>main2.qml</file>
         <file>icons/ic_folder_black_24px.svg</file>

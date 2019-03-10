@@ -1,6 +1,6 @@
-import QtQuick 2.7
-import QtQuick.Controls 2.2
-import QtQuick.Layouts 1.3
+import QtQuick 2.12
+import QtQuick.Controls 2.5
+import QtQuick.Layouts 1.12
 import "docking"
 import "fileview"
 import "fileview/interpreter"
@@ -23,64 +23,27 @@ ApplicationWindow {
         return point.y * 16 + point.x
     }
 
-
-    header: MainMenu {
-            MainMenuItem {
-                text: qsTr("File")
-
-                MenuItem {
-                    text: qsTr("Item 1")
-
-                    MenuItem {
-                        text: qsTr("Sub item 1")
-                    }
-
-                    MenuItem {
-                        text: qsTr("Sub item 2")
-                    }
-
-                    MenuItem {
-                        text: qsTr("Sub item 3")
-                    }
-
-                    MenuItem {
-                        text: qsTr("Sub item 4")
-                    }
-                }
-
-                MenuItem {
-                    text: qsTr("Item 2")
-                }
-
-                MenuItem {
-                    text: qsTr("Item 3")
-                }
-
-                MenuItem {
-                    text: qsTr("Item 4")
-                }
-            }
-
-            MainMenuItem {
-                text: qsTr("Edit")
-            }
-
-            MainMenuItem {
-                text: qsTr("Tools")
-            }
-
-            MainMenuItem {
-                text: qsTr("Window")
-            }
-
-            MainMenuItem {
-                text: qsTr("Help")
-            }
-
-            Item {
-                Layout.fillWidth: true
-            }
+    menuBar: MenuBar {
+        Menu {
+            title: qsTr("&File")
+            Action { text: qsTr("&New...") }
+            Action { text: qsTr("&Open...") }
+            Action { text: qsTr("&Save") }
+            Action { text: qsTr("Save &As...") }
+            MenuSeparator { }
+            Action { text: qsTr("&Quit") }
         }
+        Menu {
+            title: qsTr("&Edit")
+            Action { text: qsTr("Cu&t") }
+            Action { text: qsTr("&Copy") }
+            Action { text: qsTr("&Paste") }
+        }
+        Menu {
+            title: qsTr("&Help")
+            Action { text: qsTr("&About") }
+        }
+    }
 
     Component.onCompleted: {
         currentFile.openFile('c:/Windows/explorer.exe')
