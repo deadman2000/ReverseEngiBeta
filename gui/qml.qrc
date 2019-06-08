@@ -36,5 +36,6 @@
         <file>fileview/SectionLabel.qml</file>
         <file>fonts/DejaVuSansMono.ttf</file>
         <file>fonts/DroidSansMono.ttf</file>
+        <file>fileview/SectionProp.qml</file>
     </qresource>
 </RCC>

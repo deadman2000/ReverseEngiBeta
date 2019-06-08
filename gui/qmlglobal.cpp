@@ -42,10 +42,14 @@ QObject *QmlGlobal::createStructure(FileDocument * file) const
     return nullptr;
 }
 
+QColor QmlGlobal::blendAlpha(QColor color, qreal opacity) const
+{
+    return QColor(color.red(), color.green(), color.blue(), qRound(color.alpha() * opacity));
+}
+
 void QmlGlobal::updateFontSize()
 {
     QString str(" ");
     QFontMetrics fm(_mainFont);
     _hexLetter = fm.size(0, str);
-    qDebug() << "LETTER SIZE:" << _hexLetter;
 }

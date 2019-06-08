@@ -123,7 +123,6 @@ Item {
             ctx.resetTransform()
 
             var bw = section.selected ? 2 : borderWidth
-
             var bp = borderPadding + bw / 2
 
             ctx.strokeStyle = canvas.color

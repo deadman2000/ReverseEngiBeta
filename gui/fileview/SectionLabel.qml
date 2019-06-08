@@ -6,11 +6,15 @@ Rectangle {
     height: label.height + 4
     width: label.width + height
     radius: height/2
-
-    property alias text: label.text
+    visible: false
 
     Text {
         id: label
         anchors.centerIn: parent
+    }
+
+    function showSection(section) {
+        label.text = section.name
+        visible = true
     }
 }

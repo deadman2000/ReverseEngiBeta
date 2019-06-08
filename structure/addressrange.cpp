@@ -122,6 +122,20 @@ const QString &AddressRange::name() const
     return _name;
 }
 
+bool AddressRange::contains(int address) const
+{
+    return _begin <= address && address <= _end;
+}
+
+QString AddressRange::toString() const
+{
+    return QString("%1 - %2 Vis:%3 Block:%4")
+            .arg(_begin)
+            .arg(_end)
+            .arg(_visible)
+            .arg(_isBlock);
+}
+
 bool AddressRange::isBlock() const
 {
     return _isBlock;

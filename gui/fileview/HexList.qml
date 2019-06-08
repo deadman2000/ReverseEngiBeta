@@ -32,10 +32,6 @@ Item {
     property alias model: list.model
     property alias contentY: list.contentY
 
-    SectionDrawer {
-        parent: list.contentItem
-    }
-
     ListView {
         id: list
         anchors.fill: parent
@@ -56,6 +52,8 @@ Item {
 
         footer: Item { height: list.height; width: 1 }
     }
+
+    SectionDrawer { }
 
     CursorRect { }
 

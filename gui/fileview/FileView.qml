@@ -137,9 +137,7 @@ DockPanel {
             fileView.forceActiveFocus()
 
             if (mouse.button === Qt.RightButton) {
-                menu.x = mouse.x
-                menu.y = mouse.y
-                menu.open()
+                menu.popup();
                 mouse.accepted = true
             }
         }
@@ -322,9 +320,8 @@ DockPanel {
             onTriggered: copyToClipboard()
         }
 
-        MenuItem {
-            text: "Paste"
-
+        Menu {
+            title: "Paste"
             MenuItem {
                 text: "Do Nothing"
             }
@@ -345,11 +342,10 @@ DockPanel {
         MenuSeparator {
         }
 
-        MenuItem {
-            text: "More Stuff"
-
-            MenuItem {
-                text: "Do more..."
+        Menu {
+            title: "More Stuff"
+            Menu {
+                title: "Do more..."
 
                 MenuItem {
                     text: "Do Nothing"

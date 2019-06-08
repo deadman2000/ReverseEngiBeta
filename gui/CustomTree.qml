@@ -133,6 +133,7 @@ Flickable {
             onRowExpandedChanged: {
                 if (!expanderLoader.item) expanderLoader.sourceComponent = expanderComponent
                 node.expanded = rowExpanded
+                console.log(node)
             }
 
             function expand() {

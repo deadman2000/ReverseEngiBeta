@@ -30,11 +30,6 @@ Item {
     property alias model: list.model
     property alias contentY: list.contentY
 
-    SectionDrawer {
-        parent: list.contentItem
-        borderPadding: 0
-    }
-
     ListView {
         id: list
         interactive: false
@@ -53,6 +48,8 @@ Item {
 
         footer: Item { height: list.height; width: 1 }
     }
+
+    SectionDrawer { borderPadding: 0 }
 
     CursorRect { }
 

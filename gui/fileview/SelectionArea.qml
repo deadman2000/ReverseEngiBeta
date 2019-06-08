@@ -4,6 +4,7 @@ MouseArea {
     anchors.fill: parent
     acceptedButtons: Qt.LeftButton
     propagateComposedEvents: true
+    hoverEnabled: true
 
     onPressed: {
         var p = symAt(mouse)
@@ -26,14 +27,27 @@ MouseArea {
     }
 
     onPositionChanged: {
-        if (!pressed) return
         if (mouse.x < 0 || mouse.x > width) return
 
         var p = symAt(mouse)
         if (!p) return
 
         var address = pointToAddress(p)
-        selection.begin = Math.min(pressAddress, address)
-        selection.end = Math.max(pressAddress, address)
+
+        if (pressed) {
+            selection.begin = Math.min(pressAddress, address)
+            selection.end = Math.max(pressAddress, address)
+        } else {
+            var section = currentFile.structure.getByAddress(address)
+            if (section) {
+                label.showSection(section)
+            } else {
+                label.visible = false
+            }
+        }
+    }
+
+    SectionLabel {
+        id: label
     }
 }

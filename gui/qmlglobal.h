@@ -23,6 +23,7 @@ signals:
 
 public slots:
     QObject * createStructure(FileDocument * file) const;
+    QColor blendAlpha(QColor color, qreal opacity) const;
 
 private:
     void updateFontSize();

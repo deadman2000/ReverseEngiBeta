@@ -96,3 +96,24 @@ void StructureNode::unselect()
         ((StructureNode*) n)->unselect();
     }
 }
+
+AddressRange *StructureNode::getByAddress(int address)
+{
+    //qDebug() << _block->range()->toString();
+
+    if (_block->range()->isSet()) {
+        if (!_block->range()->visible() || !_block->range()->contains(address))
+            return nullptr;
+    }
+
+    if (_expanded) {
+        for (TreeNode* n : _nodes){
+            AddressRange * r = ((StructureNode*) n)->getByAddress(address);
+            if (r) return r;
+        }
+    }
+
+    if (_block->range()->isSet())
+        return _block->range();
+    return nullptr;
+}

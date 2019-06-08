@@ -27,6 +27,8 @@ public slots:
     void select();
     void unselect();
 
+    AddressRange *getByAddress(int address);
+
 signals:
     void expandedChanged(bool);
 

@@ -47,6 +47,10 @@ public:
     void setName(const QString & value);
     const QString & name() const;
 
+    bool contains(int address) const;
+
+    QString toString() const;
+
 signals:
     void changed();
 
